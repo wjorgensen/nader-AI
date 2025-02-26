@@ -5,6 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "aiohttp>=3.11.13",
+    "dotenv>=0.9.9",
+    "openai>=1.64.0",
     "pymongo[srv]>=4.11.1",
     "python-dotenv>=1.0.1",
     "redis>=5.2.1",
