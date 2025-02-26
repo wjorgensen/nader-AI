@@ -8,8 +8,8 @@ load_dotenv()
 class KV:
     def __init__(self, url: str = None):
         self.url = url or os.getenv("REDIS_URL")
-        self.pool = redis.ConnectionPool.from_url(self.url)
-        self.conn = redis.Redis(connection_pool=self.pool)
+        self.pool = redis.ConnectionPool.from_url(self.url,)
+        self.conn = redis.Redis.from_url(self.url, decode_responses=True)
 
     def get(self, key: str):
         return self.conn.get(key)

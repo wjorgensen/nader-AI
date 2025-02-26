@@ -3,7 +3,7 @@ from twikit import Client
 from log import NaderLogger
 from red import KV
 
-class TWTWorker:
+class TWTW:
     
     def __init__(self, language='en-US', cookies_file='cookies.json'):
         """
@@ -52,10 +52,14 @@ class TWTWorker:
         self.kv.set(username, uid)
         self.logger.info(f"cached uid for {username}: {uid}")
         return uid
-
+    
+    async def dump(self, username):
+        uid = await self.uid(username)
+        usr = await self.client.get_user_by_id(uid)
+        return usr.__dict__
 
 if __name__ == "__main__":
-    worker = TWTWorker()
+    worker = TWTW()
     asyncio.run(
         worker.login(
             username='tester55002',
@@ -63,4 +67,5 @@ if __name__ == "__main__":
             password='nadertestingbot'  
         )
     )
-    asyncio.run(worker.uid('wizrdware'))
+    print(asyncio.run(worker.uid('wizrdware')))
+    print(asyncio.run(worker.dump('wizrdware')))
