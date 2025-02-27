@@ -30,7 +30,7 @@ prompts = {
         ACTION INFO:
         - NO ACTIONS SHOULD BE GENERATED FOR THIS PROMPT
         """),
-    "gather": """
+    "gather": textwrap.dedent("""
         You are currently in a conversation with a potential candidate for your network.
         You want to learn more about them and their interests and background.
         You want to eventually discern if they are a good fit for your network of great engineers, minds, creators, and innovators.
