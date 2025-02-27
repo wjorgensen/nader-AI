@@ -32,9 +32,10 @@ async def seed_network():
     people = db["people"]
 
     for usr in seed:
-        """ if people.find_one({"x_username": usr.get("x_username")}):
+        if people.find_one({"x_username": usr.get("x_username")}):
             logger.info(f"user {usr.get('x_username')} already exists, skipping")
-            continue """
+            continue
+        
         logger.info(f"seeding {usr}")
         username = usr.get("x_username")
         xuid = str(await twtw.uid(username))
