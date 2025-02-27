@@ -58,7 +58,7 @@ class AI:
 
         return prompt
     
-    async def act(self, content):
+    async def act(self, content: str):
         """
         Sends a message to the NaderAI agent and returns a structured response
         

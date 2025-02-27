@@ -90,7 +90,7 @@ class TWTW:
             self.logger.error(f"Failed to dump user data for {username}: {e}")
             return {"error": str(e)}
 
-    async def send_dm(self, username, text):
+    async def dm(self, username, text):
         """
         Send a direct message to a user by username.
         
@@ -126,7 +126,7 @@ if __name__ == "__main__":
         print(user_id)
         user_data = await worker.dump("wezabis")
         print(user_data)
-        dm_result = await worker.send_dm("wezabis", "Hello from NaderAI!")
+        dm_result = await worker.dm("wezabis", "Hello from NaderAI!")
         print(dm_result)
     
     asyncio.run(main())

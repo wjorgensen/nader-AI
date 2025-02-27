@@ -50,8 +50,9 @@ async def seed_network():
                 "github_username": usr.get("github_username"),
                 "tweets": tweets,
                 "x_bio": userdump.description,
-                "state": "seeded",
+                "state": "seed",
                 "created_at": datetime.now(),
+                "refferal": False,
             }
         )
         logger.info(f"seeded {usr}")

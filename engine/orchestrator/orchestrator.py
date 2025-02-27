@@ -14,6 +14,8 @@ from engine.packages.red import Red
 from engine.packages.worker import TWTW
 from twikit.errors import Forbidden
 
+states = ["seed", "opened"]
+
 prompts = {
     "seed": textwrap.dedent("""
         OVERVIEW:
@@ -61,7 +63,7 @@ class Orchestrator:
         if not self.mdb.client: return
 
         people = self.mdb.client["network"]["people"]
-        for person in people.find({"state": "seeded"}):
+        for person in people.find({"state": "seed"}):
             self.logger.info(f"processing {person.get('x_username')}")
             
             extra = textwrap.dedent(f"""
@@ -96,6 +98,9 @@ class Orchestrator:
                 people.update_one({"_id": person["_id"]}, {"$set": {"issue": "error", "error": str(e)}})
                 self.logger.info(f"updated issue & error for {person.get('x_username')} to error")
             
+    async def refferals(self):
+        ...
+    
     async def start(self):
         self.logger.info("starting orchestrator")
         await self.twtw.login(
@@ -106,7 +111,7 @@ class Orchestrator:
 
         await self.seeds()
 
-        schedule.every(5).minutes.do(self.seeds)
+        schedule.every(15).minutes.do(self.seeds)
 
         while True:
             schedule.run_pending()
