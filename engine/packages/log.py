@@ -1,10 +1,18 @@
 import logging
 import sys
+import os
 
-class NaderLogger:
+
+class Logger:
     _loggers = {}
 
-    def __init__(self, name: str, level: int = logging.DEBUG, output: bool = True, persist: bool = False):
+    def __init__(
+        self,
+        name: str,
+        level: int = logging.DEBUG,
+        output: bool = True,
+        persist: bool = False,
+    ):
         """
         Initialize the NaderLogger.
 
@@ -16,16 +24,15 @@ class NaderLogger:
         """
         self.name = name
 
-        if name in NaderLogger._loggers:
-            self.logger = NaderLogger._loggers[name]
+        if name in Logger._loggers:
+            self.logger = Logger._loggers[name]
             self.logger.setLevel(level)
         else:
             self.logger = logging.getLogger(name)
             self.logger.setLevel(level)
 
-            
-            lfmt = f'[{name.upper()}][%(asctime)s][%(levelname)s] --- %(message)s'
-            dfmt = '%Y-%m-%d %H:%M:%S'
+            lfmt = f"[{name.upper()}][%(asctime)s][%(levelname)s] --- %(message)s"
+            dfmt = "%Y-%m-%d %H:%M:%S"
             formatter = logging.Formatter(fmt=lfmt, datefmt=dfmt)
 
             if output:
@@ -35,14 +42,22 @@ class NaderLogger:
                 self.logger.addHandler(console_handler)
 
             if persist:
-                file_handler = logging.FileHandler(f"./logs/{name}.log")
+                # Create logs directory if it doesn't exist
+                logs_dir = os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs"
+                )
+                os.makedirs(logs_dir, exist_ok=True)
+
+                # Use absolute path for log file
+                log_file_path = os.path.join(logs_dir, f"{name}.log")
+                file_handler = logging.FileHandler(log_file_path)
                 file_handler.setLevel(level)
                 file_handler.setFormatter(formatter)
                 self.logger.addHandler(file_handler)
 
             self.logger.propagate = False
 
-            NaderLogger._loggers[name] = self.logger
+            Logger._loggers[name] = self.logger
 
     def debug(self, message: str):
         self.logger.debug(message)
@@ -67,4 +82,5 @@ class NaderLogger:
             level (int): The new logging level (e.g., logging.INFO).
         """
         self.logger.setLevel(level)
-        for handler in self.logger.handlers: handler.setLevel(level)
+        for handler in self.logger.handlers:
+            handler.setLevel(level)
