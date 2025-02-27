@@ -16,7 +16,7 @@ from engine.packages.worker import TWTW
 from twikit.errors import Forbidden
 from datetime import datetime
 
-states = ["seed", "opened"]
+states = ["seed", "gathering"]
 
 prompts = {
     "seed": textwrap.dedent("""
@@ -126,8 +126,8 @@ class Orchestrator:
                 await self.twtw.client.send_dm(user_id=xusrid, text=msg)
                 
                 self.logger.info(f"sent opening message to {person.get('x_username')}")
-                people.update_one({"_id": person["_id"]}, {"$set": {"state": "opened"}})
-                self.logger.info(f"updated state for {person.get('x_username')} to opened")
+                people.update_one({"_id": person["_id"]}, {"$set": {"state": "gathering"}})
+                self.logger.info(f"updated state for {person.get('x_username')} to gathering")
                 people.update_one(
                     {"_id": person["_id"]},
                     {
@@ -152,19 +152,7 @@ class Orchestrator:
                 self.logger.info(f"updated issue & error for {person.get('x_username')} to error")
             
     async def refferals(self):
-        full = await self.prompt("seed", extra)
-        opener = await self.ai.act(full)
-        msg = opener["response"]
-        self.logger.info(f"opening message: {msg}")
-        
-        xusrid = str(await self.twtw.uid(person.get("x_username")))
-        print(xusrid)
-        await self.twtw.client.send_dm(user_id=xusrid, text=msg)
-        self.logger.info(f"sent opening message to {person.get('x_username')}")
-        
-        people.update_one({"_id": person["_id"]}, {"$set": {"state": "opened"}})
-        self.logger.info(f"updated state for {person.get('x_username')} to opened")
-
+        ...
     
             
     async def gather(self):
@@ -174,8 +162,8 @@ class Orchestrator:
 
         people = self.mdb.client["network"]["people"]
         
-        # Process people in both "opened" and "gathering" states
-        for person in people.find({"state": {"$in": ["opened", "gathering"]}}):
+        # Process people in "gathering" states
+        for person in people.find({"state": {"$in": ["gathering"]}}):
             x_username = person.get("x_username")
             self.logger.info(f"gathering info for {x_username}")
             
@@ -306,10 +294,10 @@ class Orchestrator:
         )
 
         await self.seeds()
-        await self.gather()  # Run gather on startup as well
+        await self.gather()
 
         schedule.every(15).minutes.do(self.seeds)
-        schedule.every(5).minutes.do(self.gather)  # Schedule gather to run every 5 minutes
+        schedule.every(15).minutes.do(self.gather)
 
         while True:
             schedule.run_pending()
