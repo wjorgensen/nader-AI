@@ -166,3 +166,542 @@ a.secondary {
     filter: invert();
   }
 }
+
+/* Add animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+/* Add classes for the animations */
+.fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.pulse {
+  animation: pulse 1s infinite;
+}
+
+.dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background-color: #555;
+}
+
+.dotDelay0 {
+  animation-delay: 0s;
+}
+
+.dotDelay1 {
+  animation-delay: 0.2s;
+}
+
+.dotDelay2 {
+  animation-delay: 0.4s;
+}
+
+.inputFormContainer {
+  position: fixed;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 100;
+  transition: 
+    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 90%;
+  max-width: 800px;
+  pointer-events: auto;
+}
+
+.inputFormNormal {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 800px;
+}
+
+.inputFormShifted {
+  right: 0;
+  left: auto;
+  transform: none;
+  width: 50%;
+  max-width: none;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.inputForm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  pointer-events: auto;
+  z-index: 101;
+}
+
+.inputField {
+  flex: 1;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: 2px solid black;
+  border-radius: 50px;
+  outline: none;
+  background: transparent;
+  color: black;
+  pointer-events: auto;
+  z-index: 102;
+  font-family: inherit;
+  line-height: 1.5;
+  min-height: 48px;
+  max-height: 120px;
+  resize: none;
+  overflow-y: auto;
+  
+  /* Hide scrollbar but maintain scroll functionality */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.inputField::-webkit-scrollbar {
+  display: none;
+}
+
+.sendButton {
+  padding: 12px 24px;
+  font-size: 16px;
+  border: 2px solid black;
+  border-radius: 50px;
+  outline: none;
+  background: black;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.sendButtonEnabled {
+  cursor: pointer;
+}
+
+.sendButtonDisabled {
+  cursor: not-allowed;
+}
+
+.thinkingIndicator {
+  align-self: flex-start;
+}
+
+.dotContainer {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.suggestedMessages {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.suggestedMessagesNormal {
+  transform: translateX(-50%);
+  left: 50%;
+  width: 90%;
+  max-width: 800px;
+  justify-content: flex-start;
+}
+
+.suggestedMessagesShifted {
+  transform: translateX(0);
+  left: auto;
+  width: 50%;
+  max-width: none;
+  padding: 0 20px;
+  box-sizing: border-box;
+  justify-content: flex-start;
+}
+
+.suggestionButton {
+  padding: 8px 16px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  min-width: fit-content;
+}
+
+.suggestionButton:hover {
+  background-color: #333;
+}
+
+.canvasNormal {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-50%);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.canvasShifted {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-80%);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.chatContainer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+  transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+  z-index: 5;
+  overflow: hidden;
+}
+
+.chatContainerActive {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.chatContainerHidden {
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
+}
+
+.messagesContainer {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 120px;
+  scroll-behavior: smooth;
+  max-height: calc(100vh - 150px);
+  position: relative;
+  transition: margin-bottom 0.2s ease;
+}
+
+.messagesFadeTop {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, 
+    rgba(240, 240, 240, 1) 0%, 
+    rgba(240, 240, 240, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.messagesContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messagesContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messagesContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.messageUser {
+  align-self: flex-end;
+  max-width: 80%;
+  margin-bottom: 20px;
+}
+
+.messageAI {
+  align-self: flex-start;
+  max-width: 80%;
+  margin-bottom: 20px;
+}
+
+/* Special case for visualization messages */
+.messageAI.visualizationContainer {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Adjust the message container when it has a visualization */
+.messageAI:has(.visualizationMessage) {
+  max-width: 100%;
+  width: 100%;
+}
+
+.messageText {
+  word-break: break-word;
+  background-color: transparent;
+  padding: 12px;
+  border-radius: 12px;
+  position: relative;
+  width: 100%;
+  overflow: visible;
+  max-width: 100%;
+  color: #000;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.messageLabel {
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
+}
+
+.messageLabelUser {
+  text-align: right;
+}
+
+.messageLabelAI {
+  text-align: left;
+}
+
+.visualizationMessage {
+  width: 100%;
+  max-width: 100% !important;
+  padding: 0;
+  background: transparent;
+  overflow: visible;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+}
+
+.messageAI .visualizationMessage {
+  max-width: 100% !important;
+  width: 100%;
+  padding: 0;
+}
+
+/* Added specific styling for the visualization container in messages */
+.messageAI:has(.visualizationMessage) {
+  max-width: 95%;
+  width: 95%;
+  background: transparent;
+  padding: 0;
+}
+
+/* Remove background from messages containing visualizations */
+.messageAI:has(.visualizationMessage) .messageText {
+  background: transparent;
+  padding: 0;
+}
+
+/* Job Form Styles */
+.jobForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.formField label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-left: 5px;
+}
+
+.jobFormInput, .jobFormTextarea {
+  padding: 12px 16px;
+  border: 2px solid black;
+  border-radius: 15px;
+  background: transparent;
+  font-size: 15px;
+  line-height: 1.5;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  color: black;
+}
+
+.jobFormInput {
+  height: 48px;
+}
+
+.jobFormTextarea {
+  min-height: 80px;
+  max-height: 200px;
+  resize: none;
+  overflow-y: auto;
+  transition: height 0.2s ease;
+}
+
+/* Adjust message container for job form */
+.messageAI:has(.jobForm) {
+  max-width: 100% !important;
+  width: 100%;
+}
+
+.messageAI:has(.jobForm) .messageText {
+  padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Style the job form container specifically */
+.jobFormContainer {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
+/* Wallet Connect Styles */
+.walletConnectContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+  padding: 16px 0;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.walletInfo {
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.walletInfo p {
+  margin: 4px 0;
+}
+
+.networkWarning {
+  color: #e74c3c;
+  font-weight: 500;
+  padding: 4px 0;
+}
+
+.errorMessage {
+  background-color: rgba(231, 76, 60, 0.1);
+  border-left: 4px solid #e74c3c;
+  color: #e74c3c;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.rainbowKitWrapper {
+  width: 100%;
+}
+
+.rainbowKitWrapper button {
+  width: 100%;
+}
+
+.walletButton {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-size: 16px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.walletButton:hover {
+  background-color: #2980b9;
+}
+
+.walletButtonDisabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.paymentSection {
+  margin-top: 15px;
+}
+
+.paymentDetails {
+  background-color: transparent;
+  border-radius: 8px;
+  padding: 15px 0;
+  margin-top: 10px;
+}
+
+.feeDetails {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.paymentButton {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-size: 16px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.paymentButton:hover {
+  background-color: #27ae60;
+}
+
+.paymentButtonDisabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.walletDisclaimer {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #7f8c8d;
+  font-style: italic;
+}
