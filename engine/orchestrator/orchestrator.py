@@ -30,6 +30,15 @@ prompts = {
         
         ACTION INFO:
         - NO ACTIONS SHOULD BE GENERATED FOR THIS PROMPT
+        """),
+    "gather": textwrap.dedent("""
+        You are currently in a conversation with a potential candidate for your network.
+        You want to learn more about them and their interests and background.
+        You want to eventually discern if they are a good fit for your network of great engineers, minds, creators, and innovators.
+        We have gotten {currently_gathered info} and still need to gather {remaining info}.
+        This is their previous messages to you:
+        {previous_messages}
+        Please respond to them with a message that will help you gather the remaining information.
         """)
 }
 
