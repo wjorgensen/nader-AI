@@ -12,6 +12,7 @@ from engine.packages.log import Logger
 from engine.packages.mongo import MDB
 from engine.packages.red import Red
 from engine.packages.worker import TWTW
+from twikit.errors import Forbidden
 
 prompts = {
     "seed": textwrap.dedent("""
@@ -62,18 +63,29 @@ class Orchestrator:
                 - CANDIDATES Last Couple Of Tweets List: {person.get("tweets")}
             """)
             
-            full = await self.prompt("seed", extra)
-            opener = await self.ai.act(full)
-            msg = opener["response"]
-            self.logger.info(f"opening message: {msg}")
-            
-            xusrid = str(await self.twtw.uid(person.get("x_username")))
-            print(xusrid)
-            await self.twtw.client.send_dm(user_id=xusrid, text=msg)
-            self.logger.info(f"sent opening message to {person.get('x_username')}")
-            
-            people.update_one({"_id": person["_id"]}, {"$set": {"state": "opened"}})
-            self.logger.info(f"updated state for {person.get('x_username')} to opened")
+            try:
+                full = await self.prompt("seed", extra)
+                opener = await self.ai.act(full)
+                msg = opener["response"]
+                self.logger.info(f"opening message: {msg}")
+                
+                xusrid = str(await self.twtw.uid(person.get("x_username")))
+                print(xusrid)
+                await self.twtw.client.send_dm(user_id=xusrid, text=msg)
+                
+                self.logger.info(f"sent opening message to {person.get('x_username')}")
+                people.update_one({"_id": person["_id"]}, {"$set": {"state": "opened"}})
+                self.logger.info(f"updated state for {person.get('x_username')} to opened")
+                
+            except Forbidden as fe:
+                self.logger.error(f"Twitter API Forbidden error: {fe}")
+                people.update_one({"_id": person["_id"]}, {"$set": {"issue": "twitter_forbidden", "error": str(fe)}})
+                self.logger.info(f"updated issue & error for {person.get('x_username')} to twitter_forbidden")
+                
+            except Exception as e:
+                self.logger.error(f"error processing {person.get('x_username')}: {e}")
+                people.update_one({"_id": person["_id"]}, {"$set": {"issue": "error", "error": str(e)}})
+                self.logger.info(f"updated issue & error for {person.get('x_username')} to error")
             
     async def start(self):
         self.logger.info("starting orchestrator")
