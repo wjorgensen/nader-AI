@@ -23,14 +23,14 @@ prompts = {
 }
 
 class Orchestrator:
-    def __init__(self):
+    async def __init__(self):
         self.logger = Logger("orchestrator", persist=True)
         self.mdb = MDB()
         self.mdb.connect()
         self.kv = Red()
         self.ai = AI()
         self.twtw = TWTW()
-        self.twtw.login(
+        await self.twtw.login(
             username=os.getenv("TWITTER_USERNAME"),
             email=os.getenv("TWITTER_EMAIL"),
             password=os.getenv("TWITTER_PASSWORD"),
