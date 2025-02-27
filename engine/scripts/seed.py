@@ -46,6 +46,7 @@ async def seed_network():
         people.insert_one(
             {
                 "x_username": usr.get("x_username"),
+                "x_name": userdump.name,
                 "github_username": usr.get("github_username"),
                 "tweets": tweets,
                 "x_bio": userdump.description,

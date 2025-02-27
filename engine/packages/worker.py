@@ -90,16 +90,43 @@ class TWTW:
             self.logger.error(f"Failed to dump user data for {username}: {e}")
             return {"error": str(e)}
 
+    async def send_dm(self, username, text):
+        """
+        Send a direct message to a user by username.
+        
+        Args:
+            username (str): Twitter username to send DM to
+            text (str): Message content
+            
+        Returns:
+            dict: Result of the DM operation or error information
+        """
+        try:
+            uid = await self.uid(username)
+            self.logger.info(f"Sending DM to {username} (ID: {uid})")
+            result = await self.client.send_dm(user_id=str(uid), text=text)
+            self.logger.info(f"DM sent successfully to {username}")
+            return result
+        except Exception as e:
+            self.logger.error(f"Failed to send DM to {username}: {e}")
+            return {"error": str(e)}
+
 
 if __name__ == "__main__":
     print(os.getcwd())
-    worker = TWTW()
-    asyncio.run(
-        worker.login(
+    
+    async def main():
+        worker = TWTW()
+        await worker.login(
             username=os.getenv("TWITTER_USERNAME"),
             email=os.getenv("TWITTER_EMAIL"),
             password=os.getenv("TWITTER_PASSWORD"),
         )
-    )
-    print(asyncio.run(worker.uid("wezabis")))
-    print(asyncio.run(worker.dump("wezabis")))
+        user_id = await worker.uid("wezabis")
+        print(user_id)
+        user_data = await worker.dump("wezabis")
+        print(user_data)
+        dm_result = await worker.send_dm("wezabis", "Hello from NaderAI!")
+        print(dm_result)
+    
+    asyncio.run(main())
