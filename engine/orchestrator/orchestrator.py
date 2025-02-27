@@ -1,11 +1,16 @@
 import asyncio
 import schedule
 import time
+import os
+import dotenv
+
+dotenv.load_dotenv()
 
 from engine.agent.index import AI
 from engine.packages.log import Logger
 from engine.packages.mongo import MDB
 from engine.packages.red import Red
+from engine.packages.worker import TWTW
 
 prompts = {
     "seed": """
@@ -24,6 +29,12 @@ class Orchestrator:
         self.mdb.connect()
         self.kv = Red()
         self.ai = AI()
+        self.twtw = TWTW()
+        self.twtw.login(
+            username=os.getenv("TWITTER_USERNAME"),
+            email=os.getenv("TWITTER_EMAIL"),
+            password=os.getenv("TWITTER_PASSWORD"),
+        )
 
     async def seeds(self):
         self.logger.info("processing seeds")

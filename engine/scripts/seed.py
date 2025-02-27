@@ -37,16 +37,17 @@ async def seed_network():
             continue """
         logger.info(f"seeding {usr}")
         username = usr.get("x_username")
-        print("username", username)
-        twusrid = str(await twtw.uid(username))
-        print("twusrid", twusrid)
-        tweets = await twtw.client.get_user_tweets(user_id=twusrid, tweet_type="Tweets")
-        print(tweets)
-
+        xuid = str(await twtw.uid(username))
+        userdump = await twtw.client.get_user_by_id(xuid)
+        print(userdump)
+        rawtweets = await twtw.client.get_user_tweets(user_id=xuid, tweet_type="Tweets")
+        tweets = [tweet.full_text for tweet in rawtweets if not tweet.full_text.startswith("RT @")]
         people.insert_one(
             {
                 "x_username": usr.get("x_username"),
                 "github_username": usr.get("github_username"),
+                "tweets": tweets,
+                "x_bio": userdump.description,
                 "state": "seeded",
                 "created_at": datetime.now(),
             }
