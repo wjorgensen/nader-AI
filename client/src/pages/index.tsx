@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -358,9 +358,6 @@ export default function Home() {
   // Handle job form submission
   const handleJobFormSubmit = async (formData: JobFormData) => {
     try {
-      // Hide the form
-      setShowJobForm(false);
-      
       // Add a user message confirming submission
       setMessages(prev => [...prev, {
         role: 'user', 
@@ -397,8 +394,11 @@ export default function Home() {
         content: data.response
       }]);
       
-      // Show wallet connect after response
-      setShowWalletConnect(true);
+      // Add wallet connect component to messages
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: <WalletConnect onPaymentComplete={handlePaymentComplete} />
+      }]);
       
     } catch (error) {
       console.error('Error:', error);
@@ -411,9 +411,8 @@ export default function Home() {
     }
   };
 
-  // Add handler for payment completion
+  // Update handlePaymentComplete to add messages directly to the array
   const handlePaymentComplete = () => {
-    setShowWalletConnect(false);
     setPaymentComplete(true);
     
     // Add a confirmation message
@@ -460,11 +459,15 @@ export default function Home() {
         }
       ]);
       
-      // Scroll to bottom after a short delay to ensure the component is rendered
+      // Scroll just enough to show the top of the stats component
       setTimeout(() => {
         const messagesContainer = document.querySelector(`.${styles.messagesContainer}`);
-        if (messagesContainer) {
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        const lastMessage = document.querySelector(`.${styles.messagesContainer} > div:last-of-type`);
+        if (messagesContainer && lastMessage) {
+          const containerRect = messagesContainer.getBoundingClientRect();
+          const messageRect = lastMessage.getBoundingClientRect();
+          // Scroll so that the top of the stats is visible
+          messagesContainer.scrollTop = messageRect.top - containerRect.top + messagesContainer.scrollTop - 20; // 20px padding
         }
       }, 100);
       
@@ -473,43 +476,37 @@ export default function Home() {
 
     // Check if this is the job form message
     if (userMessage === 'I have a job I want filled') {
-      // If conversation is not active yet, wait for animation to complete before showing form
+      // Add job form to messages
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: (
+            <div className={styles.jobFormWrapper}>
+              <p>Please fill out the job details:</p>
+              <JobForm onSubmit={handleJobFormSubmit} />
+            </div>
+          )
+        }
+      ]);
+      
+      // If conversation is not active yet, wait for animation to complete
       if (!isConversationActive) {
-        // First activate conversation mode
         setIsConversationActive(true);
-        
-        // Delay showing the form until animation completes (1.2s duration + small buffer)
-        setTimeout(() => {
-          setShowJobForm(true);
-          
-          // Wait a bit more for the form to render, then scroll to top
-          setTimeout(() => {
-            const formContainer = document.querySelector(`.${styles.jobFormContainer}`);
-            if (formContainer) {
-              const messagesContainer = document.querySelector(`.${styles.messagesContainer}`);
-              if (messagesContainer) {
-                // Cast formContainer to HTMLElement to access offsetTop
-                messagesContainer.scrollTop = (formContainer as HTMLElement).offsetTop - 20;
-              }
-            }
-          }, 100);
-        }, 1300); // Wait for animation to complete (1.2s + 100ms buffer)
-      } else {
-        // If conversation is already active, show form immediately
-        setShowJobForm(true);
-        
-        // Scroll to top of form after it renders
-        setTimeout(() => {
-          const formContainer = document.querySelector(`.${styles.jobFormContainer}`);
-          if (formContainer) {
-            const messagesContainer = document.querySelector(`.${styles.messagesContainer}`);
-            if (messagesContainer) {
-              // Cast formContainer to HTMLElement to access offsetTop
-              messagesContainer.scrollTop = (formContainer as HTMLElement).offsetTop - 20;
-            }
-          }
-        }, 100);
       }
+      
+      // Scroll just enough to show the top of the job form
+      setTimeout(() => {
+        const messagesContainer = document.querySelector(`.${styles.messagesContainer}`);
+        const lastMessage = document.querySelector(`.${styles.messagesContainer} > div:last-of-type`);
+        if (messagesContainer && lastMessage) {
+          const containerRect = messagesContainer.getBoundingClientRect();
+          const messageRect = lastMessage.getBoundingClientRect();
+          // Scroll so that the top of the form is visible
+          messagesContainer.scrollTop = messageRect.top - containerRect.top + messagesContainer.scrollTop - 20; // 20px padding
+        }
+      }, 100);
+      
       return;
     }
     
@@ -551,11 +548,31 @@ export default function Home() {
 
   useEffect(() => setMounted(true), []);
 
-  // Add this useEffect to handle auto-scrolling after new messages
+  // Modify the useEffect for auto-scrolling
   useEffect(() => {
-    const messagesContainer = document.querySelector(`.${styles.messagesContainer}`);
-    if (messagesContainer) {
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // Only auto-scroll if the newest message is a text message, not a visualization or form
+    if (messages.length > 0) {
+      const latestMessage = messages[messages.length - 1];
+      
+      // Simplified check for special components
+      const isSpecialComponent = 
+        typeof latestMessage.content !== 'string' && 
+        latestMessage.content !== null &&
+        typeof latestMessage.content === 'object' &&
+        (
+          // Check if it's a DataVisualization component
+          (latestMessage.content as any)?.type === DataVisualization || 
+          // Check if it has className that includes jobFormWrapper
+          (latestMessage.content as any)?.props?.className?.includes('jobFormWrapper')
+        );
+      
+      // Don't auto-scroll for special components like DataVisualization or JobForm
+      if (!isSpecialComponent) {
+        const messagesContainer = document.querySelector(`.${styles.messagesContainer}`);
+        if (messagesContainer) {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+      }
     }
   }, [messages]); // Scroll whenever messages update
 
@@ -615,19 +632,6 @@ export default function Home() {
             </div>
           ))}
           
-          {/* Add Job Form */}
-          {showJobForm && (
-            <div className={`${styles.messageAI} ${styles.fadeIn} ${styles.jobFormContainer}`}>
-              <div className={styles.messageText}>
-                <p>Please fill out the job details:</p>
-                <JobForm onSubmit={handleJobFormSubmit} />
-              </div>
-              <div className={`${styles.messageLabel} ${styles.messageLabelAI}`}>
-                AI
-              </div>
-            </div>
-          )}
-          
           {/* Thinking animation */}
           {isThinking && (
             <div className={`${styles.thinkingIndicator} ${styles.fadeIn}`}>
@@ -635,18 +639,6 @@ export default function Home() {
                 <span className={`${styles.dot} ${styles.pulse} ${styles.dotDelay0}`}></span>
                 <span className={`${styles.dot} ${styles.pulse} ${styles.dotDelay1}`}></span>
                 <span className={`${styles.dot} ${styles.pulse} ${styles.dotDelay2}`}></span>
-              </div>
-            </div>
-          )}
-          
-          {/* Wallet Connect */}
-          {showWalletConnect && (
-            <div className={`${styles.messageAI} ${styles.fadeIn}`}>
-              <div className={styles.messageText}>
-                <WalletConnect onPaymentComplete={handlePaymentComplete} />
-              </div>
-              <div className={`${styles.messageLabel} ${styles.messageLabelAI}`}>
-                AI
               </div>
             </div>
           )}
