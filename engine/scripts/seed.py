@@ -53,6 +53,10 @@ async def seed_network():
                 "state": "seed",
                 "created_at": datetime.now(),
                 "refferal": False,
+                "convos": {
+                    "sent": [],
+                    "received": [],
+                }
             }
         )
         logger.info(f"seeded {usr}")

@@ -13,6 +13,7 @@ from engine.packages.mongo import MDB
 from engine.packages.red import Red
 from engine.packages.worker import TWTW
 from twikit.errors import Forbidden
+from datetime import datetime
 
 states = ["seed", "opened"]
 
@@ -87,6 +88,18 @@ class Orchestrator:
                 self.logger.info(f"sent opening message to {person.get('x_username')}")
                 people.update_one({"_id": person["_id"]}, {"$set": {"state": "opened"}})
                 self.logger.info(f"updated state for {person.get('x_username')} to opened")
+                people.update_one(
+                    {"_id": person["_id"]},
+                    {
+                        "$push": {
+                            "convos.sent": {
+                                "message": msg,
+                                "timestamp": datetime.now()
+                            }
+                        }
+                    }
+                )
+                self.logger.info(f"updated convo.sent for {person.get('x_username')}")
                 
             except Forbidden as fe:
                 self.logger.error(f"Twitter API Forbidden error: {fe}")
