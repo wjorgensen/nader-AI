@@ -16,7 +16,7 @@ const networkStatsData: StatCardProps[] = [
   // Users in network
   { 
     title: 'Network Users', 
-    value: '2,547', 
+    value: '8', 
     type: 'users',
     // Add historical data for users
     history: {
