@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env.local
+.venv
+env/
+venv/
+ENV/
+*.egg-info/
+
+# Logs
+logs/
+*.log
+
+# Cache directories
+.ruff_cache/
+.pytest_cache/
+
+# VS Code
+.vscode/
+
+# Client-side code (not needed for server)
+client/
+
+# Other
+.DS_Store
+node_modules/ 
