@@ -407,9 +407,9 @@ a.secondary {
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  margin-bottom: 120px;
+  margin-bottom: 170px;
   scroll-behavior: smooth;
-  max-height: calc(100vh - 150px);
+  max-height: calc(100vh - 200px);
   position: relative;
   transition: margin-bottom 0.2s ease;
 }
@@ -593,50 +593,17 @@ a.secondary {
 
 /* Wallet Connect Styles */
 .walletConnectContainer {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 16px;
-  padding: 16px 0;
-  animation: fadeIn 0.4s ease-in-out;
-}
-
-.walletInfo {
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.05);
+  padding: 16px;
   border-radius: 12px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.walletInfo p {
-  margin: 4px 0;
-}
-
-.networkWarning {
-  color: #e74c3c;
-  font-weight: 500;
-  padding: 4px 0;
-}
-
-.errorMessage {
-  background-color: rgba(231, 76, 60, 0.1);
-  border-left: 4px solid #e74c3c;
-  color: #e74c3c;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-bottom: 16px;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.rainbowKitWrapper {
   width: 100%;
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
-.rainbowKitWrapper button {
-  width: 100%;
+.walletConnectContainer h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 18px;
 }
 
 .walletButton {
@@ -704,4 +671,19 @@ a.secondary {
   font-size: 12px;
   color: #7f8c8d;
   font-style: italic;
+}
+
+.logoText {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  z-index: 10;
+  font-weight: bold;
+  font-size: 24px;
+  font-family: 'Arial', sans-serif;
+  color: #000;
+}
+
+.logoText span {
+  letter-spacing: 0.5px;
 }

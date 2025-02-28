@@ -6,6 +6,7 @@ import styles from '../styles/Home.module.css';
 import DataVisualization from './components/dataVisualization';
 import JobForm, { JobFormData } from './components/JobForm';
 import WalletConnect from './components/WalletConnect';
+import { submitJob } from '../../api/jobCall';
 
 // Import the StatCardProps type from the DataVisualization component
 import type { StatCardProps } from './components/dataVisualization';
@@ -74,6 +75,8 @@ export default function Home() {
   const [showJobForm, setShowJobForm] = useState(false);
   const [showWalletConnect, setShowWalletConnect] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
+  const [currentJobData, setCurrentJobData] = useState<JobFormData | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -331,6 +334,9 @@ export default function Home() {
 
   // Handle job form submission
   const handleJobFormSubmit = async (formData: JobFormData) => {
+    // Store the form data for later submission after payment
+    setCurrentJobData(formData);
+    
     setMessages(prev => {
       // Remove JobForm component from messages
       const messagesWithoutForm = prev.filter(msg => 
@@ -346,23 +352,25 @@ export default function Home() {
         },
         {
           role: 'assistant',
-          content: <WalletConnect onPaymentComplete={handlePaymentComplete} />
+          content: <WalletConnect 
+            onPaymentComplete={() => handlePaymentComplete(formData)}
+            onPaymentRejected={handlePaymentRejected}
+            onProviderDisconnect={handleProviderDisconnect}
+          />
         }
       ];
     });
   };
 
-  // Update handlePaymentComplete to replace the payment window with a summary
-  const handlePaymentComplete = () => {
-    setPaymentComplete(true);
-
+  // Handle payment rejection
+  const handlePaymentRejected = (reason: string) => {
     setMessages(prev => {
-      // Replace WalletConnect component with summary message
+      // Replace WalletConnect component with rejection message
       const newMessages = prev.map(msg => {
         if (typeof msg.content !== 'string' && (msg.content as any)?.type === WalletConnect) {
           return {
             role: 'assistant',
-            content: "Your job request has been submitted successfully! Payment received! I'll begin searching for potential candidates within my network immediately and will email you with results. Thank you for your business!"
+            content: `Payment was not completed: ${reason}. Please try again or use a different payment method.`
           };
         }
         return msg;
@@ -370,6 +378,81 @@ export default function Home() {
 
       return newMessages;
     });
+  };
+
+  // Handle provider disconnection
+  const handleProviderDisconnect = () => {
+    setMessages(prev => {
+      // Replace WalletConnect component with disconnection message
+      const newMessages = prev.map(msg => {
+        if (typeof msg.content !== 'string' && (msg.content as any)?.type === WalletConnect) {
+          return {
+            role: 'assistant',
+            content: "Wallet disconnected. Please reconnect your wallet to complete the payment."
+          };
+        }
+        return msg;
+      });
+
+      return newMessages;
+    });
+  };
+
+  // Update handlePaymentComplete to accept jobData parameter
+  const handlePaymentComplete = async (jobData: JobFormData) => {
+    setPaymentComplete(true);
+    setIsThinking(true);
+
+    try {
+      // Use the passed job data directly
+      // Call the API to submit the job
+      const result = await submitJob(jobData);
+      
+      // Update UI with success message
+      setMessages(prev => {
+        // Replace WalletConnect component with success message
+        const newMessages = prev.map(msg => {
+          if (typeof msg.content !== 'string' && (msg.content as any)?.type === WalletConnect) {
+            return {
+              role: 'assistant',
+              content: "Your job request has been submitted successfully! Payment received and job details saved. I'll begin searching for potential candidates within my network immediately and will email you with results. Thank you for your business!"
+            };
+          }
+          return msg;
+        });
+
+        return newMessages;
+      });
+      
+      // Clear stored job data
+      setCurrentJobData(null);
+      setSubmissionError(null);
+      
+    } catch (error) {
+      console.error("Failed to submit job:", error);
+      
+      // Store error message
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setSubmissionError(errorMessage);
+      
+      // Update UI with error message
+      setMessages(prev => {
+        // Replace WalletConnect component with error message
+        const newMessages = prev.map(msg => {
+          if (typeof msg.content !== 'string' && (msg.content as any)?.type === WalletConnect) {
+            return {
+              role: 'assistant',
+              content: `Payment was successful, but there was an error submitting your job: ${errorMessage}. Our team will contact you to resolve this issue.`
+            };
+          }
+          return msg;
+        });
+
+        return newMessages;
+      });
+    } finally {
+      setIsThinking(false);
+    }
   };
 
   // Update handleSubmit function to include the new message response
@@ -487,7 +570,7 @@ export default function Home() {
     
     try {
       // Call our API endpoint
-      const response = await fetch('/api/hyperbolic', {
+      const response = await fetch('/api/gaia', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -576,6 +659,11 @@ export default function Home() {
         overflow: 'hidden'
       }}
     >
+      {/* Logo */}
+      <div className={styles.logoText}>
+        <span>NaderAI</span>
+      </div>
+      
       <canvas 
         ref={canvasRef} 
         className={isConversationActive ? styles.canvasShifted : styles.canvasNormal}
