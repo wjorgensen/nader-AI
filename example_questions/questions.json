@@ -1,0 +1,198 @@
+{
+    "question_1": {
+        "text": "What was the title of the Eigenlayer Token whitepaper?\n\nA.\n\nE\n\nGEN: Intersubjective Work Verified\n\nGEN: The Universal Intersubjective Work Token\n\nGEN: Open Digital Commons Verification Token\n\nGEN: Powering the Verifiable Cloud",
+        "source_image": "Screenshot 2024-09-30 at 7.17.08 PM.png"
+    },
+    "question_2": {
+        "text": "Which of these protocols is used as a bridge between certain EVM chains and the biggest\nBitcoin sidechain by TVL?\n\nA. Axelar\nB. Wormhole\nC. LayerZero\n\n© D. DeBridge",
+        "source_image": "Screenshot 2024-09-30 at 7.26.19 PM.png"
+    },
+    "question_3": {
+        "text": "As per L2Beat, which of these is not a Stage 1 rollup?\n\nA. Linea\n\nB. Arbitrum\n\nC. Optimism\n\nD. dYdX v3\n\nClear selection",
+        "source_image": "Screenshot 2024-09-30 at 7.04.12 PM.png"
+    },
+    "question_4": {
+        "text": "Which one of these was NOT a part of the Al-meta trade in late 2022 - early 2023?\n\nA. OLAS\n\nB. RLC\n\nCc. OCEAN\n\nD. PHB",
+        "source_image": "Screenshot 2024-09-30 at 7.08.22 PM.png"
+    },
+    "question_5": {
+        "text": "Memecoin NEIRO was recently listed on Binance - what exactly was the listing?\n\nA. Community coin - spot, Cabal coin - perps\nB. Perps listing\nC. Community coin - perps, Cabal coin - spot\n\n© D. Spot listing",
+        "source_image": "Screenshot 2024-09-30 at 7.22.20 PM.png"
+    },
+    "question_6": {
+        "text": "Which is the largest L2 by TVL according to the DefiLlama dashboard?\n\nA. Base\nB. Arbitrum\nC. Optimism\n\n© D. Polygon",
+        "source_image": "Screenshot 2024-09-30 at 7.22.04 PM.png"
+    },
+    "question_7": {
+        "text": "Which protocol enables the trading of tokenized future yield via an AMM?\n\nA. Liquity\n\nB. Renzo\n\nC. Pendle\n\nD. Gearbox",
+        "source_image": "Screenshot 2024-09-30 at 7.16.38 PM.png"
+    },
+    "question_8": {
+        "text": "What is OTC?\n\nA. Portion of shares that are in the hands of public investors\n\nB. Market where buyers enter competitive bids and sellers submit competitive offers\n\nC. Self-regulated financial trading venue\n\nD. Off-exchange trading directly between third parties",
+        "source_image": "Screenshot 2024-09-30 at 7.28.45 PM.png"
+    },
+    "question_9": {
+        "text": "Who originally tweeted: \"some things are better left unsaid. Recommend no more news like\nthese, for the sake of the people, our industry (and your business)\"\n\nA. Cobie\n\nB. Changpeng Zhao\n\nC. SBF\n\nD. Larry Cermak",
+        "source_image": "Screenshot 2024-09-30 at 7.28.57 PM.png"
+    },
+    "question_10": {
+        "text": "What is the best out of these ways to benchmark throughput for L2s?\n\nA. Historical Ethereum workload\n\nB. ETH<>USDT Swaps\n\nC. ETH Transfers\n\nD. State roots posted to L1",
+        "source_image": "Screenshot 2024-09-30 at 7.28.34 PM.png"
+    },
+    "question_11": {
+        "text": "Pick the correct pair of Algorithmic Stablecoin - Creator:\n\n© A. USDT- Tether\n© B. USDe -Ethena\nC. agEUR - Algorand\n\nD. DAI - Maker",
+        "source_image": "Screenshot 2024-09-30 at 7.27.56 PM.png"
+    },
+    "question_12": {
+        "text": "Where does Parallel Execution fall short in creating a truly high performance environment?\n\nA. Gas Fees\n\nB. Single-app performance\n\nC. Multiple-apps running together on a network\n\nD. Parallel Execution is enough to scale a blockchain",
+        "source_image": "Screenshot 2024-09-30 at 7.18.15 PM.png"
+    },
+    "question_13": {
+        "text": "Why is there a gas limit on Ethereum?\n\nA. To ensure that the user has funds to pay gas\n© B. To limit the maximum gas consumption during a transaction\nC. To limit user spend on gas fee below wallet amount\n\nD. To sort transactions: if the user sets a high gas limit, then his transaction has a high\npriority\n\nClear selection",
+        "source_image": "Screenshot 2024-09-30 at 7.08.04 PM.png"
+    },
+    "question_14": {
+        "text": "The MegaMind Quiz\n\n() Wes\n\nPoints:\nPercentage:\nDuration:\n\nDate started:\n\nDate finished:\n\n49/100\n\n49%\n\n00:29:44\n\nTue 1 Oct '24 07:01\n\nTue 1 Oct '24 07:30",
+        "source_image": "Screenshot 2024-09-30 at 7.31.10 PM.png"
+    },
+    "question_15": {
+        "text": "Is Blast part of the Superchain?\n\nA. No, Blast is an independent Layer 2 solution\n\nB. Blast plans to join the Superchain in the future, but is not currently part of it\n\nC. Blast uses Optimism's technology but is not officially part of the Superchain\n\nD. Yes, Blast is officially part of the Optimism Superchain",
+        "source_image": "Screenshot 2024-09-30 at 7.19.05 PM.png"
+    },
+    "question_16": {
+        "text": "Which function did Uniswap pioneer?\n\nA. Hybrid CFMMs\nB. Constant product\n© C. Constant sum\n\nD. Constant mean",
+        "source_image": "Screenshot 2024-09-30 at 7.19.21 PM.png"
+    },
+    "question_17": {
+        "text": "Which one of these Solana projects has prediction markets?\n\nA. Sanctum\n\nB. Kamino\n\nC. Drift\n\nD. Phoenix",
+        "source_image": "Screenshot 2024-09-30 at 7.05.59 PM.png"
+    },
+    "question_18": {
+        "text": "Which one of these is NOT a description of one of the MegaMafia projects?\n\nO A. Fully onchain Minecraft\n© B. Aave fork lending market\nC. Decentralized VPN\n\nD. Fastest decentralized trading venue",
+        "source_image": "Screenshot 2024-09-30 at 7.23.08 PM.png"
+    },
+    "question_19": {
+        "text": "Which L2 most recently had NFT Trading activity as one of its main airdrop criteria?\n\nA. Zora\n\nB. Optimism Airdrop 4\n\nC. Frame\n\nD. Abstract Chain",
+        "source_image": "Screenshot 2024-09-30 at 7.25.53 PM.png"
+    },
+    "question_20": {
+        "text": "Which of these is NOT an example of brutal mogging by Vitalik Buterin?\nA. | don't understand why you're still doing your current twitter strategy, | feel like you\n\nkinda fell off ~2 years ago. IMO you either be an honorable intellectual, or you go full\n@inversebrah. Your current approach fails at both, neither clever nor funny.\n\nB. RT @blknoiz06: \"a lot of the luna hate seems to come from the eth camp ive seen\"\n\nC. Yeah but your size is not size\n\nD. | don't even know or care who you are.",
+        "source_image": "Screenshot 2024-09-30 at 7.22.49 PM.png"
+    },
+    "question_21": {
+        "text": "Which one of these is a General Messaging Protocol?\n\nA. Orbiter\nB. Across\nO C. Stargate Finance\n\nD. Axelar",
+        "source_image": "Screenshot 2024-09-30 at 7.25.16 PM.png"
+    },
+    "question_22": {
+        "text": "Which one of these is NOT a ticker of a token from the DePIN category?\n\nA. HNT\n© B.CFX\nC. GRT\n\nD. AKT\n\nClear selection",
+        "source_image": "Screenshot 2024-09-30 at 7.04.16 PM.png"
+    },
+    "question_23": {
+        "text": "Which one of these was NOT a guest on the UpOnly podcast live during FTX's implosion?\n\nA. Gainzy\n\nB. Martin Shkreli\n\nC. Avi Felman\n\nD. Evgeny Gaevoy\n\nE. Do Kwon\n\nF. Jim Talbot",
+        "source_image": "Screenshot 2024-09-30 at 7.10.04 PM.png"
+    },
+    "question_24": {
+        "text": "Could you trade TheDAO token through the Uniswap UI?\n\nA. Even if the pool exists, Uniswap doesn't want to provide trading of securities\n\nB. Nope, there shouldn't be a pool because this token was created before the Uniswap\n\nlaunch\n\n© C. Yes, if there is a pool\n\nD. Yes, but only after KYC",
+        "source_image": "Screenshot 2024-09-30 at 7.23.30 PM.png"
+    },
+    "question_25": {
+        "text": "Narwhal and Tusk are:\n\nA. Consensus algorithms created by Aptos and Sui teams\n\nB. Just sea animals\n\nC. Cosmos IBC data structures\n\nD. Polkadot finality gadgets",
+        "source_image": "Screenshot 2024-09-30 at 7.11.10 PM.png"
+    },
+    "question_26": {
+        "text": "Which is the oldest hack in the top 15 on the rekt.news leaderboard?\n\nA. Poly Network - $611mn\n\nB. Euler Finance - $197mn\n\nC. BitMart - $196mn\n\nD. Vulcan Forged - $140mn",
+        "source_image": "Screenshot 2024-09-30 at 7.16.14 PM.png"
+    },
+    "question_27": {
+        "text": "What project popularized merkle tree airdrops?\n\nA. Uniswap\n\nB. 1inch\n\nCc. Curve\n\nD. Optimism",
+        "source_image": "Screenshot 2024-09-30 at 7.24.45 PM.png"
+    },
+    "question_28": {
+        "text": "What does EIP 7702 NOT bring to Ethereum in terms of Account Abstraction?\n\nA. Paymaster Contracts\nB. Smart Contract Wallets (SCWs)\nC. Externally Owned Accounts (EOAs)\n\n© D. User-operation Transaction",
+        "source_image": "Screenshot 2024-09-30 at 7.20.16 PM.png"
+    },
+    "question_29": {
+        "text": "What was previously used as an alt account by the founder of Echo?\n\nA. Oxtheia\n\nB. AgentChud\n\nC. paidgroupxbt\n\nD. mingXmecca",
+        "source_image": "Screenshot 2024-09-30 at 7.15.51 PM.png"
+    },
+    "question_30": {
+        "text": "Which one of these is NOT an issuer of a spot Ethereum ETF?\n\nA. ProShares\n© B. Hashdex\nCc. VanEck\n\nD. Blackrock",
+        "source_image": "Screenshot 2024-09-30 at 7.15.43 PM.png"
+    },
+    "question_31": {
+        "text": "What does immutability enable in crypto applications?\n\n© A. Permanent record with no change of state possible\nB. Censorship resistance\nC. Every unit of a token being indistinguishable\n\nD. Privacy of transactions",
+        "source_image": "Screenshot 2024-09-30 at 7.20.51 PM.png"
+    },
+    "question_32": {
+        "text": "Which one of these protocols introduced a Proof of Donation mechanism in its airdrop?\n\nA. Blur S2\n\nB. LayerZero\n\nC. Eigenlayer\n\nD. Kamino",
+        "source_image": "Screenshot 2024-09-30 at 7.21.34 PM.png"
+    },
+    "question_33": {
+        "text": "Which cat coin won the Polymarket bet to reach $1b FDV first?\n\nA. Keycat\n\nB. POPCAT\n\nC. HOBBES\n\nD. Shark Cat",
+        "source_image": "Screenshot 2024-09-30 at 7.13.08 PM.png"
+    },
+    "question_34": {
+        "text": "Founder of which cryptocurrency exchange is associated with the phrase 'Yachtzeee'?\n\nA. Binance\n\nB. Kucoin\n\nC. BitMEX\n\nD. ByBit",
+        "source_image": "Screenshot 2024-09-30 at 7.21.47 PM.png"
+    },
+    "question_35": {
+        "text": "How do you \"cancel\" a transaction you've broadcasted on Ethereum?\n\nA. Send another transaction with the same nonce\nB. You send another transaction but with higher gas fee\nC. Press the cancel button under your address on etherscan\n\n© D. Not possible, the blockchain is immutable\n\nClear selection",
+        "source_image": "Screenshot 2024-09-30 at 7.08.42 PM.png"
+    },
+    "question_36": {
+        "text": "How does Proto-Danksharding reduce rollup transaction costs on rollups?\n\nA. Slightly increasing hardware requirements for node operators\nB. Directly increasing the block size\n© C. Splitting up which validators are required to store the data\n\nD. Storing its data in cheaper, temporary storage",
+        "source_image": "Screenshot 2024-09-30 at 7.14.59 PM.png"
+    },
+    "question_37": {
+        "text": "Which protocol's leader resigned amidst internal conflicts and the height of Solana's stale\noracle issues in H1 2024?\n\nA. Tensor\nB. MarginFi\n\n© C. Jupiter\n\nD. Drift\n\nClear selection",
+        "source_image": "Screenshot 2024-09-30 at 7.09.48 PM.png"
+    },
+    "question_38": {
+        "text": "What is a common security threat during hard forks?\n\nA. Replay Attacks\n\nB. Sybil Attack\n\nC. Sandwich Attacks\n\nD. DDoS Attack",
+        "source_image": "Screenshot 2024-09-30 at 7.12.45 PM.png"
+    },
+    "question_39": {
+        "text": "What kind of coins alluded to an early vision of NFTs?\n\nA. Blobs\n\nB. Inscriptions\n\nC. No conceptual precedents for NFTs\n\nD. Coloured Coins",
+        "source_image": "Screenshot 2024-09-30 at 7.15.18 PM.png"
+    },
+    "question_40": {
+        "text": "Who among these is not one of the cats of CT?\n\nA. Awawat\n\nB. CL207\n\nC. weremeow\n\nD. Husslin",
+        "source_image": "Screenshot 2024-09-30 at 7.19.55 PM.png"
+    },
+    "question_41": {
+        "text": "Which of these personalities launched on omnichain naming solution?\n\nA. OxLamps\n\nB. Oxfoobar\n\nC. OxMaki\n\nD. Oxjune_",
+        "source_image": "Screenshot 2024-09-30 at 7.13.24 PM.png"
+    },
+    "question_42": {
+        "text": "This guy is known as \"Black GCR\" and has previously appeared on the UpOnly Podcast:\n\nA. KSI\n\nB. Ansem\n\nC. LedgerStatus\n\nD. Arthur Hayes",
+        "source_image": "Screenshot 2024-09-30 at 7.21.08 PM.png"
+    },
+    "question_43": {
+        "text": "Which of these inscription coins is the largest by market cap?\n\nA. PUPS\n\nB. SATS\n\nCc. WZRD\n\nD. ORDI",
+        "source_image": "Screenshot 2024-09-30 at 7.20.34 PM.png"
+    },
+    "question_44": {
+        "text": "How much did it cost to mint Punks in 2017?\n\n@® A.0.01 ETH\nB. Free\nC. .02 ETH\n\nD. 1 ETH",
+        "source_image": "Screenshot 2024-09-30 at 7.23.17 PM.png"
+    },
+    "question_45": {
+        "text": "Who typically performs on-chain liquidations in DeFi protocols?\n\n© A. The protocol's smart contract automatically\nB. Dedicated liquidation bots run by independent operators\nC. Centralized exchanges\n\nD. The protocol developers",
+        "source_image": "Screenshot 2024-09-30 at 7.06.08 PM.png"
+    },
+    "question_46": {
+        "text": "What is required to run an Ethereum node?\n\nA. Deposit 32 ETH to earn rewards\n© B. Running client software with modest hardware while staying online\nC. Operate powerful ASIC mining machines to reach network consensus\n\nD. Work full time in Blockchain infrastructure",
+        "source_image": "Screenshot 2024-09-30 at 7.19.41 PM.png"
+    },
+    "question_47": {
+        "text": "What does it commonly mean to FSH a token?\n\n© A. Fully Salted Hash\nB. Full Stack Hitler\nC. Full Stack HODL\n\nD. Full Stack Halvening",
+        "source_image": "Screenshot 2024-09-30 at 7.28.09 PM.png"
+    },
+    "question_48": {
+        "text": "Why is ETH often used in its wrapped form (WETH) in DeFi protocols?\n\nA. To reduce gas fees\n\nB. To provide additional security features\n\nC. To make ETH compatible with the ERC-20 standard\n\nD. To increase transaction speed",
+        "source_image": "Screenshot 2024-09-30 at 7.14.30 PM.png"
+    },
+    "question_49": {
+        "text": "Which one of these is NOT a ticker of a token from the RWA category?\n\nA. OM\n\n© B.NOT\n\nCc. CHEX\n\nD. ONDO",
+        "source_image": "Screenshot 2024-09-30 at 7.22.37 PM.png"
+    }
+}
