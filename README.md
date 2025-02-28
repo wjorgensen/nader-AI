@@ -1,24 +1,8 @@
 # Nader AI
+https://www.naderai.xyz/
 
-## Project Overview
+## Architecture
 
-
-## System Architecture
-
-## Development Workflow
-
-Local development is facilitated using `uv` for Python package management:
-```
-~ nader-AI/engine $ uv sync
-~ nader-AI/ $ uv run -m engine.main
-~ nader-AI/ $ uv run -m engine.packages.telegram
-~ nader-AI/ $ uv run -m engine.scripts.seed
-```
-
-For deployment, Docker Compose is used:
-```
-$ docker-compose up -d
-```
 
 ## Local Development
 We recommend using `uv` with python for local development.  
