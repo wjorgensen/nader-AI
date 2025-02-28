@@ -414,3 +414,9 @@ class Orchestrator:
 
 if __name__ == "__main__":
     orchestrator = Orchestrator()
+    
+    # start the scheduler
+    schedule.every(15).minutes.do(orchestrator.seeds)
+    schedule.every(15).minutes.do(orchestrator.gather)
+    schedule.every(15).minutes.do(orchestrator.testing)
+    
