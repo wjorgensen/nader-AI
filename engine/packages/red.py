@@ -1,4 +1,4 @@
-import redis
+import redis.asyncio as redis
 import os
 from dotenv import load_dotenv
 from contextlib import contextmanager
@@ -7,9 +7,9 @@ load_dotenv()
 
 
 class Red:
-    def __init__(self, url: (str | None) = None):
-        self.url = url or os.getenv("REDIS_URL") or "redis://localhost:6379"
-        self.red = redis.Redis.from_url(self.url, decode_responses=True)
+    def __init__(self):
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        self.red = redis.from_url(redis_url, decode_responses=True)
 
     def flushdb(self):
         return self.red.flushdb()

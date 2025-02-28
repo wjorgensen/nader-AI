@@ -8,7 +8,7 @@ class ReferralSystem:
     def __init__(self):
         self.mdb = MDB()
         self.mdb.connect()
-        self.WEZABIS_CODE = "WEZABIS-BASED-BUILDER"  # Permanent unlimited code for wezabis
+        self.WEZABIS_CODE = "joinTheNetwork"  # Permanent unlimited code for wezabis
         
     def generate_code(self, length: int = 8) -> str:
         """Generate a random referral code"""
@@ -38,8 +38,12 @@ class ReferralSystem:
         if not self.mdb.client:
             return None
             
-        # Check for wezabis permanent code
-        if referrer_username.lower() == "wezabis" and code == self.WEZABIS_CODE:
+        # Clean up username (remove @ if present)
+        clean_username = referrer_username.replace("@", "").lower()
+            
+        # Check for wezabis - accept any code for wezabis
+        if clean_username == "wezabis":
+            # For wezabis, any code works
             return {
                 "telegram_username": "wezabis",
                 "is_permanent": True
@@ -47,7 +51,7 @@ class ReferralSystem:
             
         # Find the referrer
         referrer = self.mdb.client["network"]["people"].find_one({
-            "telegram_username": referrer_username.replace("@", "")
+            "telegram_username": clean_username
         })
         
         if not referrer:
