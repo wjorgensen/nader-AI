@@ -1,4 +1,5 @@
 # Nader AI
+https://www.naderai.xyz/
 
 ## Local Development
 We recommend using `uv` with python for local development.  
