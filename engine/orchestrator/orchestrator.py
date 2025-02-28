@@ -121,27 +121,26 @@ class Orchestrator:
                 msg = opener["response"]
                 self.logger.info(f"opening message: {msg}")
                 
-                xusrid = str(await self.twtw.uid(person.get("x_username")))
-                print(xusrid)
-                dm = await self.twtw.client.send_dm(user_id=xusrid, text=msg)
-                
-                self.logger.info(f"sent opening message to {person.get('x_username')}")
-                people.update_one({"_id": person["_id"]}, {"$set": {"state": "gathering"}})
-                self.logger.info(f"updated state for {person.get('x_username')} to gathering")
-                people.update_one(
-                    {"_id": person["_id"]},
-                    {
-                        "$push": {
-                            "dm": {
-                                "timestamp": datetime.now(),
-                                "content": dm.text,
-                                "id": dm.id,
-                                "sender": "naderai",
-                            }
-                        }
-                    }
-                )
-                self.logger.info(f"updated dm [] for {person.get('x_username')}")
+                # xusrid = str(await self.twtw.uid(person.get("x_username")))
+                # print(xusrid)
+                # dm = await self.twtw.client.send_dm(user_id=xusrid, text=msg)
+                # self.logger.info(f"sent opening message to {person.get('x_username')}")
+                # people.update_one({"_id": person["_id"]}, {"$set": {"state": "gathering"}})
+                # self.logger.info(f"updated state for {person.get('x_username')} to gathering")
+                # people.update_one(
+                #     {"_id": person["_id"]},
+                #     {
+                #         "$push": {
+                #             "dm": {
+                #                 "timestamp": datetime.now(),
+                #                 "content": dm.text,
+                #                 "id": dm.id,
+                #                 "sender": "naderai",
+                #             }
+                #         }
+                #     }
+                # )
+                # self.logger.info(f"updated dm [] for {person.get('x_username')}")
                 
             except Forbidden as fe:
                 self.logger.error(f"Twitter API Forbidden error: {fe}")
