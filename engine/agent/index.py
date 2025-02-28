@@ -3,8 +3,6 @@ import json
 import asyncio
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
-from .actions import generate_actions_list, definitions
-
 from engine.packages.log import Logger
 from engine.packages.mongo import MDB
 from engine.packages.red import Red
