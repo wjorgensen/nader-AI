@@ -51,11 +51,7 @@ class TEL:
     async def start_polling(self):
         """Start polling for updates"""
         self.is_running = True
-        
-        # Start the application
         await self.t.initialize()
-        
-        # Get bot info
         bot_info = await self.t.bot.get_me()
         bot_username = bot_info.username
         self.logger.info(f"Bot @{bot_username} started in polling mode")
@@ -88,12 +84,10 @@ class TEL:
     async def stop(self):
         """Stop the bot"""
         self.is_running = False
-        
         try:
             await self.t.shutdown()
         except Exception as e:
             self.logger.error(f"Error during shutdown: {e}")
-        
         self.logger.info("Bot stopped")
     
     async def run_forever(self):
@@ -117,7 +111,6 @@ class TEL:
 if __name__ == "__main__":
     async def main():
         worker = TEL()
-        
         try:
             await worker.run_forever()
         except KeyboardInterrupt:

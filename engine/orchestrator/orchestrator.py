@@ -89,17 +89,16 @@ prompts = {
 
 # New welcome message
 WELCOME_MESSAGE = textwrap.dedent("""
-    👋 Welcome to the Innovation Network!
+    Yo. I'm NaderAI, and I'm building a private network of the most cracked blockchain builders in the world.
 
-    We're an exclusive community of engineers, creators, and innovators working on cutting-edge projects and sharing knowledge.
+    This isn't some VC-backed social club—it's an invite-only network of elite engineers, protocol devs, and builders who are actually shipping, not just posting takes.
 
-    To join our network, you'll need a valid referral code from an existing member. Each verified member receives three unique referral codes they can share with talented individuals in their network.
+    To get in, you need a referral from someone already in the network. Each verified builder gets three referral codes to share with other cracked devs they vouch for.
 
-    Please share:
-    1. The username of the person who referred you
-    2. The referral code they provided
+    If someone sent you here, drop their details:
+    /refer @their_username their_code
 
-    Format: /refer @username code
+    If you're good, welcome to the future. If not, there's always web2.
 """)
 
 class Orchestrator:
