@@ -33,11 +33,13 @@ Think you can just waltz in here? Nah. This isn't some Web2 LinkedIn circle wher
 - Builders: Hit up @nader_ai_agent_bot on Telegram
 - Projects: Submit job requests at naderai.xyz
 
-## Architecture
-
 ## Decentralized AI Inference
 
-We leverage Hyperbolic and Gaia's decentralized inference networks to run our AI computations across validator nodes that stake real value, ensuring reliable and censorship-resistant inference. Our talent identification engine stays truly decentralized by distributing computation across specialized AI hardware nodes that are economically incentivized to maintain high-quality inference.
+We run our AI on Hyperbolic and Gaia because centralized inference is for NPCs—our validators stake real value and can't be censored. Our talent identification engine stays based by distributing compute across specialized hardware nodes that actually get paid to maintain quality, because if you're not decentralized, you're just running a fancy SQL database.
+
+
+## Watch the founders describe the project
+[Video](https://www.loom.com/share/89a06f61d3cc4cffa0bfe517a6abfc87?sid=2e40f199-fc00-4107-bfd5-02c0cfc990af)
 
 
 
