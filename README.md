@@ -1,6 +1,14 @@
 # Nader AI
 
-## server deployment
+## Local Development
+We recommend using `uv` with python for local development.  
+`~ nader-AI/engine $ uv sync`  
+`~ nader-AI/ $ uv run -m engine.main`  
+`~ nader-AI/ $ uv run -m engine.packages.telegram`  
+`~ nader-AI/ $ uv run -m engine.scripts.seed`  
+... etc
+
+## Engine Deployment
 
 `$ docker-compose up -d`
 
@@ -10,7 +18,7 @@ To stop the server:
 `docker-compose down`
 
 
-### Environment Variables
+## Environment Variables
 
 The engine requires the following environment variables:
 
@@ -23,3 +31,13 @@ The engine requires the following environment variables:
 - `GAIA_API_KEY`: Gaia API key
 - `TELEGRAM_TOKEN`: Telegram bot token
 - `GITHUB_PAT`: Path to the GitHub repository
+
+## Other Requirements
+
+- Docker
+- Docker Compose
+- MongoDB
+    - Ensure that your MongoDB instance is running and accessible
+- Redis
+- Python
+- UV
