@@ -5,6 +5,8 @@ import os
 import dotenv
 import textwrap
 import json
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
 dotenv.load_dotenv()
 
@@ -85,6 +87,21 @@ prompts = {
         """)
 }
 
+# New welcome message
+WELCOME_MESSAGE = textwrap.dedent("""
+    👋 Welcome to the Innovation Network!
+
+    We're an exclusive community of engineers, creators, and innovators working on cutting-edge projects and sharing knowledge.
+
+    To join our network, you'll need a valid referral code from an existing member. Each verified member receives three unique referral codes they can share with talented individuals in their network.
+
+    Please share:
+    1. The username of the person who referred you
+    2. The referral code they provided
+
+    Format: /refer @username code
+""")
+
 class Orchestrator:
     def __init__(self):
         self.logger = Logger("orchestrator", persist=True)
@@ -92,8 +109,62 @@ class Orchestrator:
         self.mdb.connect()
         self.kv = Red()
         self.ai = AI()
-        self.twtw = TWTW()
+        # Remove Twitter worker, add Telegram bot
+        self.bot = Application.builder().token(os.getenv("TELEGRAM_TOKEN")).build()
         
+    async def setup_handlers(self):
+        """Setup Telegram command handlers"""
+        self.bot.add_handler(CommandHandler("start", self.start_command))
+        self.bot.add_handler(CommandHandler("refer", self.handle_referral))
+
+    async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle the /start command"""
+        await update.message.reply_text(WELCOME_MESSAGE)
+        
+    async def handle_referral(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle referral code submission"""
+        if not context.args or len(context.args) != 2:
+            await update.message.reply_text("Please use the format: /refer @username referral_code")
+            return
+            
+        referrer_username = context.args[0]
+        referral_code = context.args[1]
+        
+        # Verify referral in database
+        people = self.mdb.client["network"]["people"]
+        referrer = people.find_one({
+            "telegram_username": referrer_username.replace("@", ""),
+            "referral_codes": referral_code
+        })
+        
+        if not referrer:
+            await update.message.reply_text("Invalid referral code or username. Please check and try again.")
+            return
+            
+        # Add new user to network
+        new_user = {
+            "telegram_id": update.effective_user.id,
+            "telegram_username": update.effective_user.username,
+            "state": "gathering",
+            "referrer": referrer_username,
+            "joined_at": datetime.now(),
+            "referral_codes": self.generate_referral_codes(),  # Implement this method
+            "referrals_used": 0
+        }
+        
+        people.insert_one(new_user)
+        
+        await update.message.reply_text(
+            "Welcome to the network! We'll now collect some information to help connect you with other members."
+        )
+        # Continue with gathering process...
+
+    def generate_referral_codes(self, count=3):
+        """Generate unique referral codes"""
+        # Implement referral code generation logic
+        # Return array of unique codes
+        pass
+
     async def prompt(self, key, details):
         base = prompts[key]
         return f"{base}\n{details}"
@@ -288,21 +359,10 @@ class Orchestrator:
     
     async def start(self):
         self.logger.info("starting orchestrator")
-        await self.twtw.login(
-            username=os.getenv("TWITTER_USERNAME"),
-            email=os.getenv("TWITTER_EMAIL"),
-            password=os.getenv("TWITTER_PASSWORD"),
-        )
-
-        await self.seeds()
-        #await self.gather()
-
-        schedule.every(15).minutes.do(self.seeds)
-        schedule.every(15).minutes.do(self.gather)
-
-        while True:
-            schedule.run_pending()
-            time.sleep(10)
+        await self.setup_handlers()
+        await self.bot.initialize()
+        await self.bot.start()
+        await self.bot.run_polling()
 
 
 if __name__ == "__main__":
