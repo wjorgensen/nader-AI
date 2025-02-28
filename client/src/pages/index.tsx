@@ -39,7 +39,7 @@ const networkStatsData: StatCardProps[] = [
     type: 'activity',
     data: { 
       updates: [
-        { text: 'User johnsmith93 joined the network', time: '2 mins ago' },
+        { text: 'User Wezabis joined the network', time: '2 mins ago' },
         { text: 'Connection established with devTeam', time: '15 mins ago' },
         { text: 'New job posted: Senior React Dev', time: '45 mins ago' },
         { text: 'Profile match found for jobID#1234', time: '1 hour ago' },
