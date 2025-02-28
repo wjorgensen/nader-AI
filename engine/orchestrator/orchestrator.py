@@ -74,7 +74,7 @@ prompts = {
         1. GitHub username
         2. Email address
         
-        Format your response as a JSON object with these fields:
+        YOU MUST FORMAT your response as a JSON object with these fields:
         {
             "github_username": "extracted username or null if not found",
             "email": "extracted email or null if not found",
