@@ -123,7 +123,7 @@ class Orchestrator:
                 
                 xusrid = str(await self.twtw.uid(person.get("x_username")))
                 print(xusrid)
-                await self.twtw.client.send_dm(user_id=xusrid, text=msg)
+                dm = await self.twtw.client.send_dm(user_id=xusrid, text=msg)
                 
                 self.logger.info(f"sent opening message to {person.get('x_username')}")
                 people.update_one({"_id": person["_id"]}, {"$set": {"state": "gathering"}})
@@ -132,14 +132,16 @@ class Orchestrator:
                     {"_id": person["_id"]},
                     {
                         "$push": {
-                            "convos.sent": {
-                                "message": msg,
-                                "timestamp": datetime.now()
+                            "dm": {
+                                "timestamp": datetime.now(),
+                                "content": dm.text,
+                                "id": dm.id,
+                                "sender": "naderai",
                             }
                         }
                     }
                 )
-                self.logger.info(f"updated convo.sent for {person.get('x_username')}")
+                self.logger.info(f"updated dm [] for {person.get('x_username')}")
                 
             except Forbidden as fe:
                 self.logger.error(f"Twitter API Forbidden error: {fe}")
@@ -294,7 +296,7 @@ class Orchestrator:
         )
 
         await self.seeds()
-        await self.gather()
+        #await self.gather()
 
         schedule.every(15).minutes.do(self.seeds)
         schedule.every(15).minutes.do(self.gather)

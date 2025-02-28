@@ -16,13 +16,10 @@ class TWTW:
             cookies_file (str, optional): Path to store/load cookies for authentication.
             If None, defaults to cookies.json in the engine/cookies directory.
         """
-        # Get the absolute path to the project root directory
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
         
-        # Set default cookies path if not provided
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
         if cookies_file is None:
             cookies_file = os.path.join(project_root, "engine", "cookies", "cookies.json")
-        # If a relative path is provided, make it absolute from the project root
         elif not os.path.isabs(cookies_file):
             cookies_file = os.path.join(project_root, cookies_file)
             
