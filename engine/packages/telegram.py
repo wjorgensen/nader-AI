@@ -35,6 +35,7 @@ prompts = {
         worked on or where they might have worked at, or what projects they might have done, Keep it broad, fun, and general. 
         remember you're trying to get them to join the network.
         
+        DO NOT DEVIATE
         YOU MUST RESPOND IN JSON FORMAT OF:
         {
             "message": "Your message here"
@@ -61,6 +62,7 @@ prompts = {
         
         IF THE PERSON STAYS, YOU MUST SHAPE YOUR RESPONSE TO ENCOURAGE THEM TO TRY AGAIN, AND TO BE MORE DESCRIPTIVE ABOUT THEMSELVES.
         
+        DO NOT DEVIATE!
         !!!! YOU MUST RESPOND IN JSON FORMAT OF:
         {
             "message": "Your message here",
@@ -95,6 +97,7 @@ prompts = {
         
         YOU WANT TO EXTRACT AROUND 3-5 SKILLS AND ADJECTIVES AND THEMES FROM THE CANDIDATE BEFORE MOVING THEM ON TO THE NEXT STAGE.
         
+        DO NOT DEVIATE
         YOU MUST RESPOND IN JSON FORMAT OF:
         {
             "message": "Your message here",
@@ -116,6 +119,7 @@ prompts = {
         3. Encourage them to stay in touch and share any projects they're working on
         4. Maintain a friendly, casual conversation
         
+        DO NOT DEVIATE
         YOU MUST RESPOND IN JSON FORMAT OF:
         {
             "message": "Your message here"
@@ -130,6 +134,7 @@ prompts = {
         3. Ask if they're interested in learning more
         4. If they express interest, provide them with the calendar link to schedule a call
         
+        DO NOT DEVIATE
         YOU MUST RESPOND IN JSON FORMAT OF:
         {
             "message": "Your message here",
@@ -154,6 +159,7 @@ prompts = {
         If there are multiple potential matches, select the best one.
         If there are no good matches, indicate that.
         
+        DO NOT DEVIATE
         YOU MUST RESPOND IN JSON FORMAT OF:
         {{
             "match_found": true/false,
@@ -305,8 +311,15 @@ class TEL:
         
         opener = await self.ai.act(full)
         res = opener["response"]
-        if isinstance(res, str): msg = json.loads(res)['message']
-        else: msg = res['message']
+        try:
+            if isinstance(res, str): 
+                msg = json.loads(res)['message']
+            else: 
+                msg = res['message']
+        except Exception as e:
+            self.logger.error(f"Failed to parse AI response in refer: {str(e)}. Response: {res}")
+            msg = "Hey, our dev fucked up some code and I couldn't parse that. Welcome to the network though! Tell me a bit about yourself and what you're working on."
+        
         self.logger.info(f"welcoming user with message: {msg}")
         
         await update.message.reply_text(msg)
@@ -351,7 +364,7 @@ class TEL:
             self.logger.info(f"processing message for {telegram_username} in state {state}")
             opener = await self.ai.act(full)
             res = opener["response"]
-            
+            print(res)
             try:
                 if isinstance(res, str):
                     response_data = json.loads(res)
@@ -363,7 +376,7 @@ class TEL:
             except (json.JSONDecodeError, KeyError) as e:
                 self.logger.error(f"Failed to parse AI response: {str(e)}. Response: {res}")
                 # Fallback message
-                msg = "I'm having trouble processing your message. Could you tell me more about yourself?"
+                msg = "Hey, our dev fucked up some code and I couldn't parse that. Can you pretty please send what you said again? I promise I'm usually smarter than this."
                 action = None
             
             self.logger.info(f"responding to user with message: {msg}")
@@ -408,13 +421,18 @@ class TEL:
             opener = await self.ai.act(full)
             res = opener["response"]
             
-            if isinstance(res, str):
-                response_data = json.loads(res)
-                msg = response_data['message']
-                extracted = response_data.get('extracted', {})
-            else:
-                msg = res['message']
-                extracted = res.get('extracted', {})
+            try:
+                if isinstance(res, str):
+                    response_data = json.loads(res)
+                    msg = response_data['message']
+                    extracted = response_data.get('extracted', {})
+                else:
+                    msg = res['message']
+                    extracted = res.get('extracted', {})
+            except Exception as e:
+                self.logger.error(f"Failed to parse AI response in gathering: {str(e)}. Response: {res}")
+                msg = "Hey, our dev fucked up some code and I couldn't parse that. Can you pretty please send what you said again? I promise I'm usually smarter than this."
+                extracted = {}
             
             self.logger.info(f"responding to user with message: {msg}")
             
@@ -551,14 +569,17 @@ class TEL:
                     job_match_eval = await self.ai.act(job_match_eval_prompt)
                     eval_res = job_match_eval["response"]
                     
-                    if isinstance(eval_res, str):
-                        try:
+                    try:
+                        if isinstance(eval_res, str):
                             eval_data = json.loads(eval_res)
-                        except json.JSONDecodeError:
-                            self.logger.error(f"Failed to parse job match evaluation response: {eval_res}")
-                            eval_data = {"match_found": False}
-                    else:
-                        eval_data = eval_res
+                        else:
+                            eval_data = eval_res
+                    except Exception as e:
+                        self.logger.error(f"Failed to parse job match evaluation response: {str(e)}. Response: {eval_res}")
+                        eval_data = {"match_found": False}
+                        await update.message.reply_text("I was trying to find job matches for you, but our dev's code is acting up. Let's chat more and I'll try again later!")
+                        await self.archive("I was trying to find job matches for you, but our dev's code is acting up. Let's chat more and I'll try again later!", "nader", telegram_username)
+                        return
                     
                     match_found = eval_data.get("match_found", False)
                     
@@ -612,13 +633,18 @@ class TEL:
                             job_match_response = await self.ai.act(job_match_full)
                             job_match_res = job_match_response["response"]
                             
-                            if isinstance(job_match_res, str):
-                                response_data = json.loads(job_match_res)
-                                msg = response_data['message']
-                                provide_link = response_data.get('provide_link', False)
-                            else:
-                                msg = job_match_res['message']
-                                provide_link = job_match_res.get('provide_link', False)
+                            try:
+                                if isinstance(job_match_res, str):
+                                    response_data = json.loads(job_match_res)
+                                    msg = response_data['message']
+                                    provide_link = response_data.get('provide_link', False)
+                                else:
+                                    msg = job_match_res['message']
+                                    provide_link = job_match_res.get('provide_link', False)
+                            except Exception as e:
+                                self.logger.error(f"Failed to parse AI response in job match: {str(e)}. Response: {job_match_res}")
+                                msg = "I found a potential job match for you, but my circuits got a bit fried trying to process it. Can you send a quick reply so I can try again? Our dev is getting fired as we speak."
+                                provide_link = False
                             
                             self.logger.info(f"presenting job match to user: {msg}")
                             
@@ -663,10 +689,14 @@ class TEL:
             response = await self.ai.act(full)
             res = response["response"]
             
-            if isinstance(res, str):
-                msg = json.loads(res)['message']
-            else:
-                msg = res['message']
+            try:
+                if isinstance(res, str):
+                    msg = json.loads(res)['message']
+                else:
+                    msg = res['message']
+            except Exception as e:
+                self.logger.error(f"Failed to parse AI response in ready state: {str(e)}. Response: {res}")
+                msg = "Oops, our dev messed up some code and I couldn't process that properly. Mind sending your message again? I promise we're usually more put together than this."
             
             self.logger.info(f"responding to ready user with message: {msg}")
             
