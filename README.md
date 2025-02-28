@@ -1,6 +1,6 @@
 # Nader AI
 
-Nader AI isn't your typical "we're disrupting talent acquisition" BS factory. We're a closed network of the most savage builders in web3, and you don't get in by updating your LinkedIn. This is the talent hub you've never heard of—and won't, unless one of our nodes decides you're worth bringing into the fold. No resume spam, no recruiter cold calls, just pure, validated technical excellence connecting with opportunities that actually matter.
+Nader AI is a closed network of the most savage builders in web3, and you don't get in by updating your LinkedIn. This is the talent hub you've never heard of—and won't, unless one of our nodes decides you're worth bringing into the fold. No resume spam, no recruiter cold calls, just pure, validated technical excellence connecting with opportunities that actually matter.
 
 ## What This Actually Does
 
@@ -33,11 +33,13 @@ Think you can just waltz in here? Nah. This isn't some Web2 LinkedIn circle wher
 - Builders: Hit up @nader_ai_agent_bot on Telegram
 - Projects: Submit job requests at naderai.xyz
 
-## Architecture
+## Decentralized AI Inference
 
-## Decntralized AI Inference
+We run our AI on Hyperbolic and Gaia because centralized inference is for NPCs—our validators stake real value and can't be censored. Our talent identification engine stays based by distributing compute across specialized hardware nodes that actually get paid to maintain quality, because if you're not decentralized, you're just running a fancy SQL database.
 
-We're not running some centralized AI show here—that's Web2 thinking. Instead, we're leveraging Hyperbolic and Gaia's decentralized inference networks because we practice what we preach. These aren't your typical cloud providers pretending to be "decentralized" by slapping a token on their AWS instances. Both networks run on actual distributed infrastructure, with computation spread across validator nodes that stake real value to ensure reliable inference. When our agent needs to think, the heavy lifting happens across a network of specialized AI hardware, not in some Silicon Valley datacenter. This means our talent identification engine stays censorship-resistant and truly decentralized—just like the web3 tech we're evaluating. Plus, the economic model means validators are incentivized to maintain high-quality inference, so our agent stays sharp without compromising on decentralization principles.
+
+## Watch the founders describe the project
+[Video](https://www.loom.com/share/89a06f61d3cc4cffa0bfe517a6abfc87?sid=2e40f199-fc00-4107-bfd5-02c0cfc990af)
 
 
 
