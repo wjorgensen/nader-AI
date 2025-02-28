@@ -12,15 +12,15 @@ import json
 
 # Custom JSON encoder to handle ObjectId serialization
 class MongoJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, ObjectId):
-            return str(obj)
-        return super().default(obj)
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return super().default(o)
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,6 +67,9 @@ async def create_job(
     # Convert to Job model with default status
     job = Job(**job_data.model_dump())
     job_dict = job.model_dump()
+    
+    if not mongo.client:
+        return {"message": "MongoDB connection failed"}
     
     job_collection = mongo.client.job_board.jobs
     result = await asyncio.to_thread(

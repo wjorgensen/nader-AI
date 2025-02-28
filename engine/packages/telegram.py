@@ -352,15 +352,19 @@ class TEL:
             opener = await self.ai.act(full)
             res = opener["response"]
             
-            print(full)
-            
-            if isinstance(res, str):
-                response_data = json.loads(res)
-                msg = response_data['message']
-                action = response_data.get('action')
-            else:
-                msg = res['message']
-                action = res.get('action')
+            try:
+                if isinstance(res, str):
+                    response_data = json.loads(res)
+                    msg = response_data['message']
+                    action = response_data.get('action')
+                else:
+                    msg = res['message']
+                    action = res.get('action')
+            except (json.JSONDecodeError, KeyError) as e:
+                self.logger.error(f"Failed to parse AI response: {str(e)}. Response: {res}")
+                # Fallback message
+                msg = "I'm having trouble processing your message. Could you tell me more about yourself?"
+                action = None
             
             self.logger.info(f"responding to user with message: {msg}")
             
@@ -455,7 +459,7 @@ class TEL:
             has_email = email or new_email
             total_skills = len((soft_skills + new_soft + hard_skills + new_hard))
             
-            if has_github and has_email and total_skills >= 7:
+            if has_github and has_email and total_skills >= 5:
                 self.logger.info(f"User {telegram_username} has provided all necessary information and is ready to be matched")
                 people.update_one(
                     {"telegram_username": telegram_username},
