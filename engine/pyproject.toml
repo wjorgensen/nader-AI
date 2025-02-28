@@ -6,10 +6,12 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "aiohttp>=3.11.13",
+    "dotenv>=0.9.9",
     "fastapi[standard]>=0.115.8",
     "openai>=1.64.0",
     "pymongo[srv]>=4.11.1",
     "python-dotenv>=1.0.1",
+    "python-telegram-bot>=21.10",
     "redis>=5.2.1",
     "schedule>=1.2.2",
     "twikit>=2.3.3",
