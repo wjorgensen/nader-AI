@@ -13,6 +13,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "python-telegram-bot>=21.10",
     "redis>=5.2.1",
+    "requests>=2.32.3",
     "schedule>=1.2.2",
     "twikit>=2.3.3",
 ]
