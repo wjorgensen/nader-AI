@@ -2,6 +2,9 @@
 
 Nader AI is a closed network of the most savage builders in web3, and you don't get in by updating your LinkedIn. This is the talent hub you've never heard of—and won't, unless one of our nodes decides you're worth bringing into the fold. No resume spam, no recruiter cold calls, just pure, validated technical excellence connecting with opportunities that actually matter.
 
+#### [DEMO VIDEO](https://www.loom.com/share/89a06f61d3cc4cffa0bfe517a6abfc87?sid=2e40f199-fc00-4107-bfd5-02c0cfc990af)
+
+
 ## What This Actually Does
 
 This agent hunts for real talent in a sea of mediocrity. We've built a system that crawls GitHub commits, Twitter threads, and obscure hacker forums to identify devs who are shipping actual innovation—not just forking Uniswap V2 and calling it groundbreaking.
@@ -23,10 +26,32 @@ For companies: Skip the recruitment theater and access pre-vetted, technically v
 
 For devs: Get connected to projects worth your time, not glorified SQL databases cosplaying as "decentralized" tech. No more wasting months building something that's going to rug its users at the first sign of a bear market.
 
+## Architecture
+The app is split into two main parts, the company/project side and the developer side.  
+
+The company side is a web app that allows entities looking for talent to post an opportunity by giving Nader-AI some spare change.
+
+The developer side is a distributed systemsy engine that runs multiple workers and services to create a network of developers, and get to know them better.  
+Most of the data is stored in unstructured NoSQL format in MongoDB. There is a caching layer to reduce load on Twitter workers. All context and information about a potential candidate or company is stored in our database and used as context when necessary. 
+
+There are many phases that are processed by the orchestrator service and simultaneously processed as messages come in.
+
+some phases: `"reffered", "welcome", "seeded", "gather", "testing", "ready", "job_match", "evaluated"`
+
+These phases are determined by Nader AI as it talks to the user and gains more information and context about them.
+
+as these phases progress different workers spawn that collect more info, help the agent make decisions, and grow the network.  
+
+some workers: `twitter: expand network, twitter: scrape user tweets, github: scrape user repos, github: determine user project proficiecy, telegram: request information`
+
+The engine is built to be modular and scalable, with the ability to add more workers and services as needed. 
+
+We hope to continue to add more workers and services to give nader-ai better context on users, and it's network.
+
+
 ## Referral Network 
 
 Think you can just waltz in here? Nah. This isn't some Web2 LinkedIn circle where everyone's a "blockchain expert". You need a referral from someone already in the network—and they're putting their reputation (and crypto) on the line for you. Every successful referral that makes it through our vetting pays out in ETH to whoever vouched for them. But here's the catch: if you refer someone who's all cap and no ship, you're taking a rep hit. No pressure. Quality over quantity, always. Real recognizes real, and in this game, your network is your net worth.
-
 
 ## Get Connected
 
@@ -36,12 +61,6 @@ Think you can just waltz in here? Nah. This isn't some Web2 LinkedIn circle wher
 ## Decentralized AI Inference
 
 We run our AI on Hyperbolic and Gaia because centralized inference is for NPCs—our validators stake real value and can't be censored. Our talent identification engine stays based by distributing compute across specialized hardware nodes that actually get paid to maintain quality, because if you're not decentralized, you're just running a fancy SQL database.
-
-
-## Watch the founders describe the project
-[Video](https://www.loom.com/share/89a06f61d3cc4cffa0bfe517a6abfc87?sid=2e40f199-fc00-4107-bfd5-02c0cfc990af)
-
-
 
 ## Local Development
 We recommend using `uv` with python for local development.  
