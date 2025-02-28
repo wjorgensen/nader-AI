@@ -17,6 +17,7 @@ from engine.packages.red import Red
 from engine.packages.worker import TWTW
 from twikit.errors import Forbidden
 from datetime import datetime
+from engine.packages.referral import ReferralSystem
 
 states = ["seed", "gathering"]
 
@@ -39,33 +40,25 @@ prompts = {
         """),
     "gather": textwrap.dedent("""
         OVERVIEW:
-        - You are continuing a conversation with a potential candidate for your network of engineers, innovators, and creators.
-        - Your goal is to naturally collect their GitHub username and email address for future collaboration.
-        - Be conversational, friendly, and genuine while gathering this information.
-        - Respond to their messages in a way that shows you're listening and interested in their work.
-        
-        CURRENT STATUS:
-        - Already gathered: {currently_gathered}
-        - Still needed: {remaining_info}
-        
-        PREVIOUS CONVERSATION:
-        {previous_messages}
+        - You are talking to someone who was referred to your network by {referrer}
+        - Your goal is to naturally collect their GitHub username and email address
+        - Be conversational, friendly, and genuine while gathering this information
         
         APPROACH:
-        - If you still need their GitHub username: Ask about their projects, what they're working on, or if they have open-source work you could check out on GitHub.
-        - If you still need their email: Mention collaboration opportunities, sharing resources, or keeping in touch as reasons for collecting their email.
-        - If they seem hesitant: Respect their privacy and don't push too hard. Instead, explain why you're asking and how it will benefit them.
-        - If you've collected all needed information: Thank them, express interest in their work, and let them know you'll be in touch.
+        - First, ask about their background and what they're building
+        - Ask about their GitHub to see their work
+        - Later, get their email for network communications
+        - Keep the tone conversational and authentic
         
         MAKE SURE TO:
-        - Keep the tone conversational and authentic
-        - Respond directly to what they've said in their messages
-        - Ask for only ONE piece of missing information at a time
-        - Don't rush or force the conversation
+        - Keep responses short and punchy
+        - Don't act like an assistant
+        - No fluff, no corporate speak
+        - Be funny but technically sharp
         
         ACTION INFO:
         - NO ACTIONS SHOULD BE GENERATED FOR THIS PROMPT
-        """),
+    """),
     "extract_info": textwrap.dedent("""
         TASK: Extract GitHub username and email from the conversation, if present.
         
@@ -84,7 +77,36 @@ prompts = {
         }
         
         Only extract information that is clearly provided by the user. Do not guess or assume information.
-        """)
+        """),
+        "success_gather": textwrap.dedent("""
+        OVERVIEW:
+        - User has successfully provided their GitHub and email
+        - You want to transition them to the testing phase
+        - Keep your tone technically sharp and authentic
+        
+        MAKE SURE TO:
+        - Acknowledge getting their info
+        - Hint at the upcoming technical evaluation
+        - Keep it short and punchy
+        - No corporate speak or formality
+        
+        ACTION INFO:
+        - NO ACTIONS SHOULD BE GENERATED FOR THIS PROMPT
+    """),
+    "stalled_gather": textwrap.dedent("""
+        OVERVIEW:
+        - After multiple attempts, user hasn't provided GitHub/email
+        - You're putting their application on hold
+        - Keep door open for when they're ready
+        
+        MAKE SURE TO:
+        - Be direct but not dismissive
+        - Imply they can continue when ready
+        - Keep your edge and authenticity
+        
+        ACTION INFO:
+        - NO ACTIONS SHOULD BE GENERATED FOR THIS PROMPT
+    """)
 }
 
 # New welcome message
@@ -109,6 +131,7 @@ class Orchestrator:
         self.kv = Red()
         self.ai = AI()
         self.bot = Application.builder().token(os.getenv("TELEGRAM_TOKEN") or "").build()
+        self.referral_system = ReferralSystem()
         
     async def setup_handlers(self):
         """Setup Telegram command handlers"""
@@ -130,14 +153,8 @@ class Orchestrator:
         referrer_username = context.args[0]
         referral_code = context.args[1]
         
-        # Verify referral in database
-        if not self.mdb.client:
-            return
-        people = self.mdb.client["network"]["people"]
-        referrer = people.find_one({
-            "telegram_username": referrer_username.replace("@", ""),
-            "referral_codes": referral_code
-        })
+        # Verify referral using new system
+        referrer = await self.referral_system.verify_referral(referrer_username, referral_code)
         
         if not referrer:
             await update.message.reply_text("Invalid referral code or username. Please check and try again.")
@@ -146,29 +163,40 @@ class Orchestrator:
         if not update.effective_user:
             await update.message.reply_text("Error: Unable to identify user. Please try again.")
             return
-        # Add new user to network
+            
+        if not self.mdb.client:
+            return
+        
+        people = self.mdb.client["network"]["people"]
+        
+        # Check if user already exists
+        existing_user = people.find_one({"telegram_id": update.effective_user.id})
+        if existing_user:
+            await update.message.reply_text("You're already in the verification process, anon.")
+            return
+            
+        # Add new user to network (in gathering state)
         new_user = {
             "telegram_id": update.effective_user.id,
             "telegram_username": update.effective_user.username,
             "state": "gathering",
             "referrer": referrer_username,
-            "joined_at": datetime.now(),
-            "referral_codes": self.generate_referral_codes(),  # Implement this method
-            "referrals_used": 0
+            "joined_at": datetime.now()
         }
         
+        # Insert new user
         people.insert_one(new_user)
         
-        await update.message.reply_text(
-            "Welcome to the network! We'll now collect some information to help connect you with other members."
-        )
-        # Continue with gathering process...
-
-    def generate_referral_codes(self, count=3):
-        """Generate unique referral codes"""
-        # Implement referral code generation logic
-        # Return array of unique codes
-        pass
+        # Generate initial gathering message using AI
+        gather_prompt = prompts["gather"].format(referrer=referrer_username)
+        gather_response = await self.ai.act(gather_prompt)
+        
+        welcome_msg = textwrap.dedent(f"""
+            Referral verified. Let's see if you're based enough for the network.
+        """)
+        
+        await update.message.reply_text(welcome_msg)
+        await update.message.reply_text(gather_response["response"])
 
     async def prompt(self, key, details):
         base = prompts[key]
@@ -362,6 +390,141 @@ class Orchestrator:
     #         except Exception as e:
     #             self.logger.error(f"Failed to process gathering for {x_username}: {str(e)}")
     
+    async def gather(self):
+        """Process users in gathering state to collect GitHub and email"""
+        if not self.mdb.client:
+            return
+
+        people = self.mdb.client["network"]["people"]
+        
+        # Process people in "gathering" state
+        for person in people.find({"state": "gathering"}):
+            telegram_id = person.get("telegram_id")
+            
+            # Get message history for this user
+            chat_history = await self.get_chat_history(telegram_id)
+            if not chat_history:
+                continue
+                
+            # Format messages for the extraction prompt
+            formatted_messages = []
+            for msg in chat_history:
+                sender = "them" if msg["user"] != "naderai" else "you"
+                formatted_messages.append(f"{sender}: {msg['text']}")
+            
+            messages_text = "\n".join(formatted_messages)
+            
+            # Check if we already have GitHub and email
+            github_username = person.get("github_username")
+            email = person.get("email")
+            
+            # If we don't have complete info, try to extract from messages
+            if not (github_username and email) and formatted_messages:
+                extract_prompt = prompts["extract_info"].format(
+                    previous_messages=messages_text
+                )
+                
+                extraction_response = await self.ai.act(extract_prompt)
+                try:
+                    extracted_info = json.loads(extraction_response["response"])
+                    
+                    # Update github_username if found
+                    if not github_username and extracted_info.get("github_username"):
+                        github_username = extracted_info["github_username"]
+                        if github_username.lower() != "null":
+                            people.update_one(
+                                {"_id": person["_id"]}, 
+                                {"$set": {"github_username": github_username}}
+                            )
+                    
+                    # Update email if found
+                    if not email and extracted_info.get("email"):
+                        email = extracted_info["email"]
+                        if email.lower() != "null":
+                            people.update_one(
+                                {"_id": person["_id"]}, 
+                                {"$set": {"email": email}}
+                            )
+                except json.JSONDecodeError:
+                    continue
+            
+            # If we have all info, move to testing state
+            if github_username and email:
+                people.update_one(
+                    {"_id": person["_id"]}, 
+                    {"$set": {"state": "testing"}}
+                )
+                
+                # Generate success message using AI
+                success_response = await self.ai.act(prompts["success_gather"])
+                await self.bot.send_message(
+                    chat_id=telegram_id,
+                    text=success_response["response"]
+                )
+                continue
+            
+            # Get current gather attempt count
+            gather_attempts = person.get("gather_attempts", 0)
+            
+            # If we've tried 3 times, mark as stalled
+            if gather_attempts >= 3:
+                people.update_one(
+                    {"_id": person["_id"]}, 
+                    {"$set": {"state": "stalled"}}
+                )
+                
+                # Generate stalled message using AI
+                stalled_response = await self.ai.act(prompts["stalled_gather"])
+                await self.bot.send_message(
+                    chat_id=telegram_id,
+                    text=stalled_response["response"]
+                )
+                continue
+            
+            # Generate next gathering message
+            gathered_info = []
+            needed_info = []
+            
+            if github_username:
+                gathered_info.append(f"GitHub username: {github_username}")
+            else:
+                needed_info.append("GitHub username")
+            
+            if email:
+                gathered_info.append(f"email: {email}")
+            else:
+                needed_info.append("email address")
+            
+            gather_prompt = prompts["gather"].format(
+                referrer=person.get("referrer", "someone"),
+                gathered=", ".join(gathered_info) if gathered_info else "nothing yet",
+                needed=", ".join(needed_info)
+            )
+            
+            gather_response = await self.ai.act(gather_prompt)
+            
+            # Send the gathering message
+            await self.bot.send_message(
+                chat_id=telegram_id,
+                text=gather_response["response"]
+            )
+            
+            # Update gather attempts
+            people.update_one(
+                {"_id": person["_id"]}, 
+                {
+                    "$inc": {"gather_attempts": 1}
+                }
+            )
+
+    async def get_chat_history(self, telegram_id: int) -> list:
+        """Get chat history for a specific user from Redis"""
+        key = f"telegram:chat:{telegram_id}:history"
+        history = await self.kv.red.get(key)
+        if history:
+            return json.loads(history)
+        return []
+
     async def start(self):
         self.logger.info("starting orchestrator")
         await self.setup_handlers()
