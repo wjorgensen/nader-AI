@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from '../../styles/Home.module.css';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount, useSendTransaction, useTransaction } from 'wagmi';
@@ -25,6 +25,9 @@ const WalletConnect: React.FC<WalletConnectProps> = ({
   const { openConnectModal } = useConnectModal();
   const { address, isConnected } = useAccount();
   const { sendTransaction, data: transactionData, error: sendError } = useSendTransaction();
+  
+  // Track if we've ever been connected
+  const hasEverConnected = useRef(false);
   
   // Transaction confirmation hook - conditionally run it
   const transactionResult = useTransaction({ 
@@ -69,20 +72,17 @@ const WalletConnect: React.FC<WalletConnectProps> = ({
     });
   };
 
-  // Handle disconnect
+  // Handle disconnect only after a wallet has connected and then disconnected
   useEffect(() => {
-    const handleDisconnect = () => {
-      if (!isConnected && !txHash) {
-        onProviderDisconnect();
-      }
-    };
-
-    // Check connection status when it changes
-    handleDisconnect();
+    // If we connect, mark that we've been connected
+    if (isConnected) {
+      hasEverConnected.current = true;
+    }
     
-    return () => {
-      // Cleanup if needed
-    };
+    // Only trigger disconnect if we previously connected and then disconnected
+    if (hasEverConnected.current && !isConnected && !txHash) {
+      onProviderDisconnect();
+    }
   }, [isConnected, txHash, onProviderDisconnect]);
 
   return (

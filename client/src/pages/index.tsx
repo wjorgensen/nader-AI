@@ -244,7 +244,7 @@ export default function Home() {
         const baseRotationZ = Math.PI;
         
         // Calculate how much to rotate based on focus point position
-        const tiltFactor = 0.05; // Reduced from 0.05 to 0.02 for much subtler movement
+        const tiltFactor = 0.10; // Reduced from 0.05 to 0.02 for much subtler movement
         
         // Calculate rotations based on where the focus point is relative to the model
         const targetTiltX = baseRotationX - focusPoint.y * tiltFactor;
