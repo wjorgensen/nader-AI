@@ -47,7 +47,7 @@ export default async function handler(
           result = await callLocalServer(message);
         } else {
           // Call Hyperbolic directly (similar to Python implementation)
-          result = await callHyperbolicDirectly(message);
+          result = await callGaiaDirectly(message);
         }
         break; // If successful, exit the retry loop
       } catch (error) {
@@ -71,11 +71,18 @@ export default async function handler(
   }
 }
 
-async function callHyperbolicDirectly(userContent: string): Promise<AgentResponse> {
-  // Initialize OpenAI client with Hyperbolic base URL
+async function callGaiaDirectly(userContent: string): Promise<AgentResponse> {
+  const apiKey = process.env.GAIA_API_KEY || "";
+  const baseURL = process.env.GAIA_BASE_URL || "https://llama8b.gaia.domains/v1";
+
+  // Initialize OpenAI client with Gaia base URL
   const client = new OpenAI({
-    apiKey: process.env.HYPERBOLIC_API_KEY || "",
-    baseURL: "https://api.hyperbolic.xyz/v1",
+    apiKey: apiKey,
+    baseURL: baseURL,
+    defaultHeaders: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    }
   });
 
   // Character data - would be better to load from a JSON file like in Python
