@@ -8,6 +8,8 @@ import json
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
+from engine.packages.github import GithubWorker
+
 dotenv.load_dotenv()
 
 from engine.agent.index import AI
@@ -77,8 +79,8 @@ prompts = {
         }
         
         Only extract information that is clearly provided by the user. Do not guess or assume information.
-        """),
-        "success_gather": textwrap.dedent("""
+    """),
+    "success_gather": textwrap.dedent("""
         OVERVIEW:
         - User has successfully provided their GitHub and email
         - You want to transition them to the testing phase
@@ -106,6 +108,37 @@ prompts = {
         
         ACTION INFO:
         - NO ACTIONS SHOULD BE GENERATED FOR THIS PROMPT
+    """),
+    "testing": textwrap.dedent("""
+        OVERVIEW:
+        - User has provided GitHub and email
+        - You want to perform technical evaluation
+        
+        YOU WILL BE PROVIDED WITH:
+        - Their GitHub username
+        - Their github repositories
+        - How many stars each repository has
+        - What the readme of each repository contains
+        
+        YOUR GOAL:
+        - Evaluate their technical skills based on a wholistic approach
+        - Determine if they are a good fit for the network
+        
+        KEEP IN MIND:
+        - not all repos may contain readme files
+        - some great repos can have low stars
+        - take a wholistic approach
+        - look at project complexity, project goals, how cool the projects are, if they are innovative
+        
+        PROVIDE A FIT SCORE FROM 1-100:
+        - 1 being a poor fit
+        - 100 being a perfect fit
+        
+        YOU MUST FORMAT your response as a JSON object with these fields:
+        {
+            "fit_score": "a number from 1-100",
+            "comments": "any additional comments on the evaluation
+        }
     """)
 }
 
@@ -132,6 +165,7 @@ class Orchestrator:
         self.ai = AI()
         self.bot = Application.builder().token(os.getenv("TELEGRAM_TOKEN") or "").build()
         self.referral_system = ReferralSystem()
+        self.git = GithubWorker()
         
     async def setup_handlers(self):
         """Setup Telegram command handlers"""
@@ -457,7 +491,7 @@ class Orchestrator:
                 
                 # Generate success message using AI
                 success_response = await self.ai.act(prompts["success_gather"])
-                await self.bot.send_message(
+                await self.bot.bot.send_message(
                     chat_id=telegram_id,
                     text=success_response["response"]
                 )
@@ -475,7 +509,7 @@ class Orchestrator:
                 
                 # Generate stalled message using AI
                 stalled_response = await self.ai.act(prompts["stalled_gather"])
-                await self.bot.send_message(
+                await self.bot.bot.send_message(
                     chat_id=telegram_id,
                     text=stalled_response["response"]
                 )
@@ -504,7 +538,7 @@ class Orchestrator:
             gather_response = await self.ai.act(gather_prompt)
             
             # Send the gathering message
-            await self.bot.send_message(
+            await self.bot.bot.send_message(
                 chat_id=telegram_id,
                 text=gather_response["response"]
             )
@@ -517,20 +551,92 @@ class Orchestrator:
                 }
             )
 
+    async def testing(self):
+        if not self.mdb.client:
+            self.logger.error("MongoDB client not available")
+            return
+
+        people = self.mdb.client["network"]["people"]
+        
+        for person in people.find({"state": "testing"}):
+            telegram_id = person.get("telegram_id")
+            github_username = person.get("github_username")
+            
+            self.logger.info(f"processing testing for {github_username}")
+            
+            repos = self.git.get_user_repositories(github_username)
+            
+            extra = textwrap.dedent(f"""
+                GITHUB DETAILS ABOUT THE POTENTIAL CANDIDATE:
+                - CANDIDATES GitHub Username: {github_username}
+                - CANDIDATES GitHub Repositories: {repos}
+                - CANDIDATES GitHub Repositories Stars: {
+                    [repo["stars"] for repo in repos or []]
+                }
+                - CANDIDATES GitHub Repositories Descriptions: {
+                    [repo["description"] for repo in repos or []]
+                }
+                - CANDIDATES GitHub Repositories Readmes: {
+                    [self.git.get_repo_readme(github_username, repo["name"]) for repo in repos or []]
+                }
+            """)
+
+            prompt = await self.prompt("testing", extra)
+            
+            try:
+                response = await self.ai.act(prompt)
+                # The response is already a dict, not a string, so we need to access the 'response' field
+                # and then parse that as JSON
+                response_text = response["response"]
+                
+                # Check if response_text is already a dict or if it needs to be parsed
+                if isinstance(response_text, str):
+                    parsed_response = json.loads(response_text)
+                else:
+                    parsed_response = response_text
+                    
+                fit_score = int(parsed_response["fit_score"])
+                
+                if fit_score >= 65:
+                    people.update_one(
+                        {"_id": person["_id"]},
+                        {"$set": {
+                            "state": "accepted",
+                            "fit_score": fit_score,
+                            "evaluation_comments": parsed_response["comments"]
+                        }}
+                    )
+                else:
+                    people.update_one(
+                        {"_id": person["_id"]},
+                        {"$set": {
+                            "state": "rejected", 
+                            "fit_score": fit_score,
+                            "evaluation_comments": parsed_response["comments"]
+                        }}
+                    )
+                
+            except Exception as e:
+                self.logger.error(f"Failed to process testing for {github_username}: {str(e)}")
+            
+            
+            
+
     async def get_chat_history(self, telegram_id: int) -> list:
         """Get chat history for a specific user from Redis"""
         key = f"telegram:chat:{telegram_id}:history"
         history = await self.kv.red.get(key)
-        if history:
-            return json.loads(history)
+        if history: return json.loads(history)
         return []
 
     async def start(self):
         self.logger.info("starting orchestrator")
-        await self.setup_handlers()
-        await self.bot.initialize()
-        await self.bot.start()
-        self.bot.run_polling()
+        #await self.setup_handlers()
+        #await self.bot.initialize()
+        #await self.bot.start()
+        #self.bot.run_polling()
+        
+        #await self.testing()
 
 
 if __name__ == "__main__":

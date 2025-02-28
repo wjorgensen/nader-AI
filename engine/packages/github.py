@@ -2,6 +2,7 @@ import requests
 import os
 import dotenv
 import base64
+from engine.packages.log import Logger
 
 dotenv.load_dotenv()
 
@@ -13,6 +14,7 @@ class GithubWorker:
         token = os.getenv("GITHUB_PAT")
         self.base_url = "https://api.github.com"
         self.headers = {"Authorization": f"token {token}"} if token else {}
+        self.logger = Logger("GITHUB", persist=True)
 
     def get_user_repositories(self, username):
         """
@@ -25,12 +27,12 @@ class GithubWorker:
             repos = response.json()
             # Filter out forked repositories
             non_fork_repos = [
-                {"name": repo["name"], "stars": repo["stargazers_count"]}
+                {"name": repo["name"], "stars": repo["stargazers_count"], "description": repo["description"]}
                 for repo in repos if not repo.get("fork", False)
             ]
             return non_fork_repos
         else:
-            print(f"Error: {response.status_code}, {response.json().get('message')}")
+            self.logger.error(f"Failed to get repositories for {username}: {response.status_code}, {response.json().get('message')}")
             return None
 
     def get_repo_stars(self, username, repo_name):
@@ -44,7 +46,7 @@ class GithubWorker:
             data = response.json()
             return data["stargazers_count"]
         else:
-            print(f"Error: {response.status_code}, {response.json().get('message')}")
+            self.logger.error(f"Failed to get stars for {username}/{repo_name}: {response.status_code}, {response.json().get('message')}")
             return None
 
     def get_repo_description(self, username, repo_name):
@@ -58,7 +60,7 @@ class GithubWorker:
             data = response.json()
             return data["description"]
         else:
-            print(f"Error: {response.status_code}, {response.json().get('message')}")
+            self.logger.error(f"Failed to get description for {username}/{repo_name}: {response.status_code}, {response.json().get('message')}")
             return None
 
     def get_repo_readme(self, username, repo_name):
@@ -73,7 +75,7 @@ class GithubWorker:
             decoded_content = base64.b64decode(data["content"]).decode('utf-8')
             return decoded_content
         else:
-            print(f"Error: {response.status_code}, {response.json().get('message')}")
+            self.logger.error(f"Failed to get README for {username}/{repo_name}: {response.status_code}, {response.json().get('message')}")
             return None
 
 if __name__ == "__main__":
@@ -84,8 +86,9 @@ if __name__ == "__main__":
     if repos:
         print(f"\nNon-forked Repositories for {username}:")
         for repo in repos:
-            print(f"{repo['name']}: ⭐ {repo['stars']} stars")
-            desc = worker.get_repo_description(username, repo["name"])
-            print(f"Description: {desc}\n")
-            readme = worker.get_repo_readme(username, repo["name"])
-            print(f"Readme:\n{readme}\n")
+            print(repo)
+            #print(f"{repo['name']}: ⭐ {repo['stars']} stars")
+            #desc = worker.get_repo_description(username, repo["name"])
+            #print(f"Description: {desc}\n")
+            #readme = worker.get_repo_readme(username, repo["name"])
+            #print(f"Readme:\n{readme}\n")

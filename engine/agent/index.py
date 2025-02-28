@@ -44,14 +44,7 @@ class AI:
                     + " ".join(self.character["style"]["chat"])
                 )}
                 
-                IMPORTANT: You MUST respond ONLY in valid JSON format with the following structure:
-                {{
-                    "response": "your response message text here",
-                    "actions": [] // array of action objects to take if needed
-                }}
-                
-                AVAILABLE ACTIONS:
-                {generate_actions_list()}
+                IMPORTANT: You MUST respond IN THE PROPER FORMAT GIVEN TO YOU.
                 
                 Keep your responses authentic to your character. Never break character.
                 """
@@ -89,15 +82,13 @@ class AI:
             parsed = json.loads(output)
             return {
                 "status": "success",
-                "response": parsed["response"],
-                "actions": parsed["actions"],
+                "response": parsed
             }
         except Exception as error:
             self.logger.error(f"error processing agent action: {str(error)}")
             return {
                 "status": "error",
                 "response": "sorry, I encountered an error processing your request.",
-                "actions": [],
             }
     
 if __name__ == "__main__":
