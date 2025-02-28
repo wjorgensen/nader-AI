@@ -109,8 +109,7 @@ class Orchestrator:
         self.mdb.connect()
         self.kv = Red()
         self.ai = AI()
-        # Remove Twitter worker, add Telegram bot
-        self.bot = Application.builder().token(os.getenv("TELEGRAM_TOKEN")).build()
+        self.bot = Application.builder().token(os.getenv("TELEGRAM_TOKEN") or "").build()
         
     async def setup_handlers(self):
         """Setup Telegram command handlers"""
@@ -118,11 +117,13 @@ class Orchestrator:
         self.bot.add_handler(CommandHandler("refer", self.handle_referral))
 
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle the /start command"""
-        await update.message.reply_text(WELCOME_MESSAGE)
+        """Send welcome message when /start command is issued"""
+        if update.message: await update.message.reply_text(WELCOME_MESSAGE)
         
     async def handle_referral(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle referral code submission"""
+        if not update.message:
+            return
         if not context.args or len(context.args) != 2:
             await update.message.reply_text("Please use the format: /refer @username referral_code")
             return
@@ -131,6 +132,8 @@ class Orchestrator:
         referral_code = context.args[1]
         
         # Verify referral in database
+        if not self.mdb.client:
+            return
         people = self.mdb.client["network"]["people"]
         referrer = people.find_one({
             "telegram_username": referrer_username.replace("@", ""),
@@ -141,6 +144,9 @@ class Orchestrator:
             await update.message.reply_text("Invalid referral code or username. Please check and try again.")
             return
             
+        if not update.effective_user:
+            await update.message.reply_text("Error: Unable to identify user. Please try again.")
+            return
         # Add new user to network
         new_user = {
             "telegram_id": update.effective_user.id,
@@ -227,142 +233,142 @@ class Orchestrator:
         ...
     
             
-    async def gather(self):
-        self.logger.info("gathering data")
+    # async def gather_twitter(self):
+    #     self.logger.info("gathering data")
 
-        if not self.mdb.client: return
+    #     if not self.mdb.client: return
 
-        people = self.mdb.client["network"]["people"]
+    #     people = self.mdb.client["network"]["people"]
         
-        # Process people in "gathering" states
-        for person in people.find({"state": {"$in": ["gathering"]}}):
-            x_username = person.get("x_username")
-            self.logger.info(f"gathering info for {x_username}")
+    #     # Process people in "gathering" states
+    #     for person in people.find({"state": {"$in": ["gathering"]}}):
+    #         x_username = person.get("x_username")
+    #         self.logger.info(f"gathering info for {x_username}")
             
-            try:
-                # Get user ID from username
-                user_id = str(await self.twtw.uid(x_username))
+    #         try:
+    #             # Get user ID from username
+    #             user_id = str(await self.twtw.uid(x_username))
                 
-                # Get previous messages from DM history
-                message_history = await self.twtw.client.get_dm_history(user_id)
-                previous_messages = []
+    #             # Get previous messages from DM history
+    #             message_history = await self.twtw.client.get_dm_history(user_id)
+    #             previous_messages = []
                 
-                # Format previous messages for the prompt
-                for message in message_history:
-                    sender = "them" if message.sender_id == user_id else "you"
-                    previous_messages.append(f"{sender}: {message.text}")
+    #             # Format previous messages for the prompt
+    #             for message in message_history:
+    #                 sender = "them" if message.sender_id == user_id else "you"
+    #                 previous_messages.append(f"{sender}: {message.text}")
                 
-                # Join the messages with newlines
-                formatted_messages = "\n".join(previous_messages)
+    #             # Join the messages with newlines
+    #             formatted_messages = "\n".join(previous_messages)
                 
-                # Check if we already have GitHub and email - first from DB
-                github_username = person.get("github_username")
-                email = person.get("email")
+    #             # Check if we already have GitHub and email - first from DB
+    #             github_username = person.get("github_username")
+    #             email = person.get("email")
                 
-                # If we don't have complete info, try to extract from previous messages
-                if not (github_username and email) and previous_messages:
-                    extract_prompt = prompts["extract_info"].format(
-                        previous_messages=formatted_messages
-                    )
+    #             # If we don't have complete info, try to extract from previous messages
+    #             if not (github_username and email) and previous_messages:
+    #                 extract_prompt = prompts["extract_info"].format(
+    #                     previous_messages=formatted_messages
+    #                 )
                     
-                    extraction_response = await self.ai.act(extract_prompt)
-                    try:
-                        extracted_info = json.loads(extraction_response["response"])
+    #                 extraction_response = await self.ai.act(extract_prompt)
+    #                 try:
+    #                     extracted_info = json.loads(extraction_response["response"])
                         
-                        # Update github_username if we found it
-                        if not github_username and extracted_info.get("github_username"):
-                            github_username = extracted_info["github_username"]
-                            if github_username.lower() != "null":
-                                people.update_one(
-                                    {"_id": person["_id"]}, 
-                                    {"$set": {"github_username": github_username}}
-                                )
-                                self.logger.info(f"Extracted GitHub for {x_username}: {github_username}")
+    #                     # Update github_username if we found it
+    #                     if not github_username and extracted_info.get("github_username"):
+    #                         github_username = extracted_info["github_username"]
+    #                         if github_username.lower() != "null":
+    #                             people.update_one(
+    #                                 {"_id": person["_id"]}, 
+    #                                 {"$set": {"github_username": github_username}}
+    #                             )
+    #                             self.logger.info(f"Extracted GitHub for {x_username}: {github_username}")
                         
-                        # Update email if we found it
-                        if not email and extracted_info.get("email"):
-                            email = extracted_info["email"]
-                            if email.lower() != "null":
-                                people.update_one(
-                                    {"_id": person["_id"]}, 
-                                    {"$set": {"email": email}}
-                                )
-                                self.logger.info(f"Extracted email for {x_username}: {email}")
-                    except json.JSONDecodeError:
-                        self.logger.error(f"Failed to parse extraction response: {extraction_response['response']}")
+    #                     # Update email if we found it
+    #                     if not email and extracted_info.get("email"):
+    #                         email = extracted_info["email"]
+    #                         if email.lower() != "null":
+    #                             people.update_one(
+    #                                 {"_id": person["_id"]}, 
+    #                                 {"$set": {"email": email}}
+    #                             )
+    #                             self.logger.info(f"Extracted email for {x_username}: {email}")
+    #                 except json.JSONDecodeError:
+    #                     self.logger.error(f"Failed to parse extraction response: {extraction_response['response']}")
                 
-                # Check if we now have all the info we need
-                if github_username and email:
-                    people.update_one(
-                        {"_id": person["_id"]}, 
-                        {"$set": {"state": "testing"}}
-                    )
-                    self.logger.info(f"Updated state for {x_username} to completed - all info gathered")
-                    continue  # Skip to next person
+    #             # Check if we now have all the info we need
+    #             if github_username and email:
+    #                 people.update_one(
+    #                     {"_id": person["_id"]}, 
+    #                     {"$set": {"state": "testing"}}
+    #                 )
+    #                 self.logger.info(f"Updated state for {x_username} to completed - all info gathered")
+    #                 continue  # Skip to next person
                 
-                # Get current gather attempt count
-                gather_attempts = person.get("gather_attempts", 0)
+    #             # Get current gather attempt count
+    #             gather_attempts = person.get("gather_attempts", 0)
                 
-                # If we've already tried 3 times, mark as stalled
-                if gather_attempts >= 3:
-                    people.update_one(
-                        {"_id": person["_id"]}, 
-                        {"$set": {"state": "stalled"}}
-                    )
-                    self.logger.info(f"Marked {x_username} as stalled after {gather_attempts} attempts")
-                    continue  # Skip to next person
+    #             # If we've already tried 3 times, mark as stalled
+    #             if gather_attempts >= 3:
+    #                 people.update_one(
+    #                     {"_id": person["_id"]}, 
+    #                     {"$set": {"state": "stalled"}}
+    #                 )
+    #                 self.logger.info(f"Marked {x_username} as stalled after {gather_attempts} attempts")
+    #                 continue  # Skip to next person
                 
-                # Determine what info we have and what we still need
-                gathered_info = []
-                needed_info = []
+    #             # Determine what info we have and what we still need
+    #             gathered_info = []
+    #             needed_info = []
                 
-                if github_username:
-                    gathered_info.append(f"GitHub username: {github_username}")
-                else:
-                    needed_info.append("GitHub username")
+    #             if github_username:
+    #                 gathered_info.append(f"GitHub username: {github_username}")
+    #             else:
+    #                 needed_info.append("GitHub username")
                 
-                if email:
-                    gathered_info.append(f"email: {email}")
-                else:
-                    needed_info.append("email address")
+    #             if email:
+    #                 gathered_info.append(f"email: {email}")
+    #             else:
+    #                 needed_info.append("email address")
                 
-                currently_gathered = "nothing yet" if not gathered_info else ", ".join(gathered_info)
-                remaining_info = ", ".join(needed_info) if needed_info else "all required information"
+    #             currently_gathered = "nothing yet" if not gathered_info else ", ".join(gathered_info)
+    #             remaining_info = ", ".join(needed_info) if needed_info else "all required information"
                 
-                # Format the gather prompt with the variables
-                base_prompt = prompts["gather"].format(
-                    currently_gathered=currently_gathered,
-                    remaining_info=remaining_info,
-                    previous_messages=formatted_messages
-                )
+    #             # Format the gather prompt with the variables
+    #             base_prompt = prompts["gather"].format(
+    #                 currently_gathered=currently_gathered,
+    #                 remaining_info=remaining_info,
+    #                 previous_messages=formatted_messages
+    #             )
                 
-                gather_response = await self.ai.act(base_prompt)
-                msg = gather_response["response"]
-                self.logger.info(f"gathering message: {msg}")
+    #             gather_response = await self.ai.act(base_prompt)
+    #             msg = gather_response["response"]
+    #             self.logger.info(f"gathering message: {msg}")
                 
-                # Send the message
-                await self.twtw.client.send_dm(user_id=user_id, text=msg)
-                self.logger.info(f"sent gathering message to {x_username}")
+    #             # Send the message
+    #             await self.twtw.client.send_dm(user_id=user_id, text=msg)
+    #             self.logger.info(f"sent gathering message to {x_username}")
                 
-                # Update gather attempts and state
-                people.update_one(
-                    {"_id": person["_id"]}, 
-                    {
-                        "$set": {"state": "gathering"},
-                        "$inc": {"gather_attempts": 1}
-                    }
-                )
-                self.logger.info(f"Updated gather attempts for {x_username} to {gather_attempts + 1}")
+    #             # Update gather attempts and state
+    #             people.update_one(
+    #                 {"_id": person["_id"]}, 
+    #                 {
+    #                     "$set": {"state": "gathering"},
+    #                     "$inc": {"gather_attempts": 1}
+    #                 }
+    #             )
+    #             self.logger.info(f"Updated gather attempts for {x_username} to {gather_attempts + 1}")
                 
-            except Exception as e:
-                self.logger.error(f"Failed to process gathering for {x_username}: {str(e)}")
+    #         except Exception as e:
+    #             self.logger.error(f"Failed to process gathering for {x_username}: {str(e)}")
     
     async def start(self):
         self.logger.info("starting orchestrator")
         await self.setup_handlers()
         await self.bot.initialize()
         await self.bot.start()
-        await self.bot.run_polling()
+        self.bot.run_polling()
 
 
 if __name__ == "__main__":

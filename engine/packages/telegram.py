@@ -7,19 +7,6 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Messa
 import dotenv
 import json
 import time
-import logging
-
-# Set up logging with DEBUG level
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.WARNING  # Changed to WARNING to suppress HTTP logs
-)
-logger = logging.getLogger(__name__)
-
-# Suppress HTTP connection logs
-logging.getLogger('httpx').setLevel(logging.WARNING)
-logging.getLogger('httpcore').setLevel(logging.WARNING)
-logging.getLogger('telegram').setLevel(logging.WARNING)
 
 dotenv.load_dotenv()
 
@@ -37,12 +24,12 @@ class TEL:
         self.t = ApplicationBuilder().token(token).build()
         self.is_running = False
     
-    def store_message(self, chat_id, username, text, message_id):
+    async def store_message(self, chat_id, username, text, message_id):
         """Store message in Redis"""
         key = f"telegram:chat:{chat_id}:history"
         
         # Get existing messages
-        existing = self.kv.red.get(key)
+        existing = await self.kv.red.get(key)
         if existing:
             messages = json.loads(existing)
         else:
@@ -77,7 +64,7 @@ class TEL:
         """Check for updates"""
         try:
             # Get the last update_id we processed
-            last_update_id = self.kv.red.get("telegram:last_update_id")
+            last_update_id = await self.kv.red.get("telegram:last_update_id")
             offset = int(last_update_id) + 1 if last_update_id else None
             
             updates = await self.t.bot.get_updates(offset=offset, limit=10, timeout=1)
@@ -91,7 +78,7 @@ class TEL:
                             message_id = message.message_id
                             chat_id = message.chat_id
                             
-                            self.store_message(chat_id, user, text, message_id)
+                            await self.store_message(chat_id, user, text, message_id)
                             
                             # Store the last update_id we processed
                             self.kv.red.set("telegram:last_update_id", str(update.update_id))
