@@ -21,7 +21,9 @@ export default function JobForm({ onSubmit }: JobFormProps) {
     calComLink: '',
     contactEmail: ''
   });
-  
+
+  const [submitted, setSubmitted] = useState(false);
+
   const formRef = useRef<HTMLFormElement>(null);
   const companyDescriptionRef = useRef<HTMLTextAreaElement>(null);
   const jobDescriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -63,7 +65,12 @@ export default function JobForm({ onSubmit }: JobFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
+    setSubmitted(true);
   };
+
+  if (submitted) {
+    return;
+  }
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className={styles.jobForm}>

@@ -12,31 +12,30 @@ import type { StatCardProps } from './components/dataVisualization';
 
 // Test data for DataVisualization component - explicitly typed to match StatCardProps
 const networkStatsData: StatCardProps[] = [
-  // User network growth graph - square card
+  // Users in network
   { 
-    title: 'Network Growth', 
-    value: '50 Users', 
-    type: 'graph' as const,
-    size: 'medium' as const,
-    data: { 
-      values: [5, 8, 12, 17, 22, 28, 35, 42, 48, 50], 
-      target: 50 
-    } 
+    title: 'Network Users', 
+    value: '2,547', 
+    type: 'users',
+    // Add historical data for users
+    history: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      values: [1824, 1967, 2135, 2290, 2421, 2547]
+    }
   },
   
-  // Accounts DM'd - small card
+  // Success rate
   { 
-    title: 'Accounts DM\'d', 
-    value: '372',
-    size: 'small' as const
+    title: 'Success Rate', 
+    value: '98.5%',
+    type: 'success'
   },
   
-  // Activity updates - tall card
+  // Activity updates
   { 
-    title: 'Activity Updates', 
-    value: '12 New', 
-    type: 'activity' as const,
-    size: 'tall' as const,
+    title: 'Activity Feed', 
+    value: 'Live Updates', 
+    type: 'activity',
     data: { 
       updates: [
         { text: 'User johnsmith93 joined the network', time: '2 mins ago' },
@@ -50,36 +49,11 @@ const networkStatsData: StatCardProps[] = [
     } 
   },
   
-  // Engineers by language - wide card
+  // Accounts contacted
   { 
-    title: 'Engineers by Language', 
-    value: '126 Total', 
-    type: 'languages' as const,
-    size: 'wide' as const,
-    data: { 
-      languages: [
-        { name: 'JavaScript', value: 42 },
-        { name: 'Python', value: 38 },
-        { name: 'Java', value: 29 },
-        { name: 'C#', value: 24 },
-        { name: 'Go', value: 17 },
-        { name: 'Rust', value: 11 }
-      ] 
-    } 
-  },
-  
-  // Success rate - small card
-  { 
-    title: 'Success Rate', 
-    value: '98.5%',
-    size: 'small' as const
-  },
-  
-  // Response time - small card
-  { 
-    title: 'Avg Response', 
-    value: '1.2s',
-    size: 'small' as const
+    title: 'Accounts Contacted', 
+    value: '14,892',
+    type: 'contacts'
   }
 ];
 
@@ -251,7 +225,7 @@ export default function Home() {
       // Update focus point based on state
       if (isThinking) {
         // When thinking, set target focus point upward
-        targetFocusPoint.set(0, 3, 0); // Look up, reduced from 5 to 3
+        targetFocusPoint.set(0, 5, 0); // Look up, reduced from 5 to 3
       }
       // No else condition for input focus - we just use the mouse position
       
@@ -267,12 +241,12 @@ export default function Home() {
         const baseRotationZ = Math.PI;
         
         // Calculate how much to rotate based on focus point position
-        const tiltFactor = 0.05; // Reduced from 0.1 to 0.05 for subtler movement
+        const tiltFactor = 0.05; // Reduced from 0.05 to 0.02 for much subtler movement
         
         // Calculate rotations based on where the focus point is relative to the model
         const targetTiltX = baseRotationX - focusPoint.y * tiltFactor;
-        const targetTiltY = baseRotationY - focusPoint.x * tiltFactor;
-        const targetTiltZ = baseRotationZ + focusPoint.x * tiltFactor * 0.5;
+        const targetTiltY = baseRotationY - focusPoint.x * tiltFactor * 0.2;
+        const targetTiltZ = baseRotationZ + focusPoint.x * tiltFactor; // Reduced from 0.5 to 0.2
         
         // Apply smooth rotation
         model.rotation.x = THREE.MathUtils.lerp(model.rotation.x, targetTiltX, 0.05);
@@ -357,72 +331,48 @@ export default function Home() {
 
   // Handle job form submission
   const handleJobFormSubmit = async (formData: JobFormData) => {
-    try {
-      // Add a user message confirming submission
-      setMessages(prev => [...prev, {
-        role: 'user', 
-        content: `Submitted job: ${formData.companyName} - ${formData.jobDescription.substring(0, 50)}...`
-      }]);
-      
-      // Set thinking state
-      setIsThinking(true);
-      
-      // Call our API endpoint to get a job summary
-      const response = await fetch('/api/hyperbolic', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    setMessages(prev => {
+      // Remove JobForm component from messages
+      const messagesWithoutForm = prev.filter(msg => 
+        typeof msg.content === 'string' || 
+        !(msg.content as any)?.props?.className?.includes('jobFormWrapper')
+      );
+
+      return [
+        ...messagesWithoutForm,
+        {
+          role: 'user', 
+          content: `Submitted job request for ${formData.companyName}`
         },
-        body: JSON.stringify({ 
-          message: `Please provide a summary of this job posting and tell me you'll help find candidates:
-          Company: ${formData.companyName}
-          Company Description: ${formData.companyDescription}
-          Job Description: ${formData.jobDescription}
-          ` 
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-      
-      const data = await response.json();
-      
-      // Add AI response
-      setMessages(prev => [...prev, {
-        role: 'assistant', 
-        content: data.response
-      }]);
-      
-      // Add wallet connect component to messages
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: <WalletConnect onPaymentComplete={handlePaymentComplete} />
-      }]);
-      
-    } catch (error) {
-      console.error('Error:', error);
-      setMessages(prev => [...prev, {
-        role: 'assistant', 
-        content: 'Sorry, I encountered an error processing your job submission.'
-      }]);
-    } finally {
-      setIsThinking(false);
-    }
+        {
+          role: 'assistant',
+          content: <WalletConnect onPaymentComplete={handlePaymentComplete} />
+        }
+      ];
+    });
   };
 
-  // Update handlePaymentComplete to add messages directly to the array
+  // Update handlePaymentComplete to replace the payment window with a summary
   const handlePaymentComplete = () => {
     setPaymentComplete(true);
-    
-    // Add a confirmation message
-    setMessages(prev => [...prev, {
-      role: 'assistant',
-      content: 'Payment received! I\'ll begin searching for within my network for potential candidates immediately and will email you with results. Thank you for your business!'
-    }]);
+
+    setMessages(prev => {
+      // Replace WalletConnect component with summary message
+      const newMessages = prev.map(msg => {
+        if (typeof msg.content !== 'string' && (msg.content as any)?.type === WalletConnect) {
+          return {
+            role: 'assistant',
+            content: "Your job request has been submitted successfully! Payment received! I'll begin searching for potential candidates within my network immediately and will email you with results. Thank you for your business!"
+          };
+        }
+        return msg;
+      });
+
+      return newMessages;
+    });
   };
 
-  // Update handleSubmit function to handle the job button
+  // Update handleSubmit function to include the new message response
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -442,6 +392,28 @@ export default function Home() {
     // Reset textarea height
     if (inputRef.current) {
       inputRef.current.style.height = 'auto';
+    }
+
+    // Handle "What happens if I join?" message
+    if (userMessage === 'What happens if I join?') {
+      setMessages(prev => [...prev, {
+        role: 'assistant', 
+        content: "Once you're in, I'll match you with job opportunities as they come up. No BS middlemen or recruiters who don't know a smart contract from a vending machine. When I see a match, I'll message you first. If you're interested, I'll send you a cal.com link to set up a meeting with the team. Direct, efficient, no wasted time. That's how real builders operate."
+      }]);
+      return;
+    }
+
+    // Handle the "I want to join the network" message
+    if (userMessage === 'I want to join the network') {
+      setMessages(prev => [...prev, {
+        role: 'assistant', 
+        content: (
+          <>
+            Alright, I need to filter out the noise. Hit up <a href="https://t.me/nader_ai_agent_bot" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', fontWeight: 'bold' }}>@nader_ai_agent_bot</a> on Telegram and drop the referral '@wezabis' with code 'joinTheNetwork'. You'll get evaluated. If you're actually building, not just tweeting, you're in. If not, don't waste my time. The network's only as strong as its weakest link, and we don't do weak links.
+          </>
+        )
+      }]);
+      return;
     }
 
     // Check for special messages
@@ -699,7 +671,7 @@ export default function Home() {
         
         {/* Suggested messages within the same container */}
         <div className={styles.suggestedMessages}>
-          {['Who are you?', 'Give me stats on your network', 'I have a job I want filled'].map((suggestion, idx) => (
+          {['Who are you?', 'Give me stats on your network', 'I have a job I want filled', 'I want to join the network', 'What happens if I join?'].map((suggestion, idx) => (
             <button 
               key={idx} 
               className={styles.suggestionButton}

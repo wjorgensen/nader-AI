@@ -4,40 +4,17 @@ import styles from '../../styles/DataVisualization.module.css';
 export interface StatCardProps {
   title: string;
   value: string | number;
-  icon?: React.ReactNode;
-  trend?: 'up' | 'down' | 'neutral';
-  trendValue?: string;
-  type?: 'default' | 'graph' | 'activity' | 'languages';
-  size?: 'small' | 'medium' | 'large' | 'tall' | 'wide';
+  type?: 'users' | 'success' | 'activity' | 'contacts';
   data?: any;
+  history?: {
+    labels: string[];
+    values: number[];
+  };
 }
 
 interface DataVisualizationProps {
   stats: StatCardProps[];
 }
-
-// Generate user network growth graph
-const UserNetworkGraph: React.FC<{ data?: { values: number[], target: number } }> = ({ data = { values: [], target: 100 } }) => {
-  return (
-    <div className={styles.graph}>
-      {data.values.map((value, index) => (
-        <div 
-          key={index} 
-          className={styles.graphBar} 
-          style={{
-            height: `${(value / data.target) * 100}%`,
-            left: `${(index / Math.max(data.values.length - 1, 1)) * 100}%`,
-            opacity: 0.7 + (index / Math.max(data.values.length - 1, 1)) * 0.3
-          }}
-        />
-      ))}
-      <div className={styles.graphLabels}>
-        <span>0</span>
-        <span>{data.target}</span>
-      </div>
-    </div>
-  );
-};
 
 // Activity updates component
 const ActivityUpdates: React.FC<{ data?: { updates: { text: string, time: string }[] } }> = ({ data = { updates: [] } }) => {
@@ -53,23 +30,63 @@ const ActivityUpdates: React.FC<{ data?: { updates: { text: string, time: string
   );
 };
 
-// Programming languages chart
-const LanguagesChart: React.FC<{ data?: { languages: { name: string, value: number }[] } }> = ({ data = { languages: [] } }) => {
-  // Find maximum value for percentage calculation
-  const maxValue = data.languages.length ? Math.max(...data.languages.map(lang => lang.value)) : 1;
+// Updated LineGraph component with black line and adjusted scaling
+const LineGraph: React.FC<{ history: { labels: string[], values: number[] } }> = ({ history }) => {
+  // We know the last value is the highest since users always grow
+  const maxValue = history.values[history.values.length - 1];
+  // Set minimum to 0 or slightly lower than the lowest value for better visualization
+  const minValue = 0;
+  const range = maxValue - minValue;
+  
+  // Calculate points for the line graph
+  const points = history.values.map((value, index) => {
+    // X position based on index (evenly spaced)
+    const x = (index / (history.values.length - 1)) * 100;
+    // Y position (inverted because SVG coordinates)
+    // Scale to use only the lower half of the available space (50%)
+    const y = 100 - ((value - minValue) / (range || 1)) * 50;
+    return { x, y, value };
+  });
+  
+  // Generate SVG path string for the line
+  const pathD = points.map((point, i) => 
+    `${i === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
+  ).join(' ');
   
   return (
-    <div>
-      {data.languages.map((language, index) => (
-        <div key={index} className={styles.languageBar}>
-          <div className={styles.languageName}>{language.name}</div>
-          <div 
-            className={styles.languageValue} 
-            style={{ width: `${(language.value / maxValue) * 100}%` }}
+    <div className={styles.lineGraphContainer}>
+      <svg className={styles.svgGraph} viewBox="0 0 100 100" preserveAspectRatio="none">
+        {/* Draw the line */}
+        <path 
+          d={pathD} 
+          className={styles.graphLine}
+          fill="none"
+        />
+        
+        {/* Draw points on the line */}
+        {points.map((point, i) => (
+          <circle 
+            key={i}
+            cx={point.x} 
+            cy={point.y} 
+            r="1.5" 
+            className={styles.graphPoint}
           />
-          <div className={styles.languagePercent}>{language.value}</div>
-        </div>
-      ))}
+        ))}
+      </svg>
+      
+      {/* X-axis labels */}
+      <div className={styles.graphLabels}>
+        {history.labels.map((label, index) => (
+          <div 
+            key={index} 
+            className={styles.graphLabel}
+            style={{ left: `${(index / (history.labels.length - 1)) * 100}%` }}
+          >
+            {label}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -77,41 +94,52 @@ const LanguagesChart: React.FC<{ data?: { languages: { name: string, value: numb
 const StatCard: React.FC<StatCardProps> = ({ 
   title, 
   value, 
-  icon, 
-  trend, 
-  trendValue, 
-  type = 'default',
-  size = 'small',
-  data 
+  type = 'users',
+  data,
+  history
 }) => {
   return (
-    <div className={`${styles.statCard} ${styles[size]}`}>
+    <div className={`${styles.statCard} ${styles[type]}`}>
       <div className={styles.statHeader}>
         <h3 className={styles.statTitle}>{title}</h3>
-        {icon && <div className={styles.statIcon}>{icon}</div>}
       </div>
       
-      {type === 'default' && (
-        <>
-          <div className={styles.statValue}>{value}</div>
-        </>
+      {(type === 'users' || type === 'success' || type === 'contacts') && (
+        <div className={styles.statValue}>{value}</div>
       )}
       
-      {type === 'graph' && <UserNetworkGraph data={data} />}
       {type === 'activity' && <ActivityUpdates data={data} />}
-      {type === 'languages' && <LanguagesChart data={data} />}
     </div>
   );
 };
 
 const DataVisualization: React.FC<DataVisualizationProps> = ({ stats = [] }) => {
+  // Find stat by type or return default
+  const getStatByType = (type: string): StatCardProps => {
+    const found = stats.find(stat => stat.type === type);
+    return found || { title: type, value: '0', type: type as any };
+  };
+
   return (
     <div className={styles.visualizationContainer}>
-      <div className={styles.gridWrapper}>
-        <div className={styles.statsGrid}>
-          {stats.map((stat, index) => (
-            <StatCard key={index} {...stat} />
-          ))}
+      <div className={styles.newLayout}>
+        <div className={styles.leftColumn}>
+          <div className={styles.usersCard}>
+            <StatCard {...getStatByType('users')} />
+          </div>
+          <div className={styles.successCard}>
+            <StatCard {...getStatByType('success')} />
+          </div>
+        </div>
+        <div className={styles.rightColumn}>
+          <div className={styles.activityCard}>
+            <StatCard {...getStatByType('activity')} />
+          </div>
+        </div>
+        <div className={styles.bottomRow}>
+          <div className={styles.contactsCard}>
+            <StatCard {...getStatByType('contacts')} />
+          </div>
         </div>
       </div>
     </div>
