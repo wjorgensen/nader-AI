@@ -6,14 +6,20 @@ from openai import AsyncOpenAI
 from engine.packages.log import Logger
 from engine.packages.mongo import MDB
 from engine.packages.red import Red
+from typing import Literal
 
 load_dotenv()
 
+URLS = {
+    "HYPERBOLIC": "https://api.hyperbolic.xyz/v1",
+    "GAIA": "https://llama8b.gaia.domains/v1",
+    "ORA": "https://api.ora.io/v1",
+}
 
 class AI:
-    def __init__(self):
-        self.api_key = os.getenv("HYPERBOLIC_API_KEY")
-        self.base_url = "https://api.hyperbolic.xyz/v1"
+    def __init__(self, network: Literal["HYPERBOLIC", "GAIA", "ORA"] = "HYPERBOLIC"):
+        self.api_key = os.getenv(f"{network}_API_KEY")
+        self.base_url = f"{URLS[network]}"
         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
         
         self.logger = Logger("agent", persist=True)

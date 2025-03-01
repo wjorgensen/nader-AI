@@ -93,6 +93,7 @@ The engine requires the following environment variables:
 - `TWITTER_EMAIL`: Twitter email
 - `HYPERBOLIC_API_KEY`: Hyperbolic API key
 - `GAIA_API_KEY`: Gaia API key
+- `ORA_API_KEY`: Ora API key
 - `TELEGRAM_TOKEN`: Telegram bot token
 - `GITHUB_PAT`: Path to the GitHub repository
 
