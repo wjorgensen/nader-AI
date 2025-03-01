@@ -687,3 +687,58 @@ a.secondary {
 .logoText span {
   letter-spacing: 0.5px;
 }
+
+.chainSelectorContainer {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.pillSelector {
+  display: flex;
+  position: relative;
+  background-color: transparent;
+  border-radius: 9999px;
+  padding: 4px;
+  margin: 0;
+  width: fit-content;
+  font-size: 14px;
+}
+
+.pillBackground {
+  position: absolute;
+  height: calc(100% - 8px);
+  background-color: #000;
+  border-radius: 9999px;
+  z-index: 1;
+  top: 4px;
+  transition: all 0.3s ease;
+}
+
+.pillOption {
+  position: relative;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 9999px;
+  z-index: 2;
+  text-align: center;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.selectedPill {
+  color: white;
+}
+
+.switchingNetwork {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.switchError {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #ef4444;
+  text-align: center;
+}

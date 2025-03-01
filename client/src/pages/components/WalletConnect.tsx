@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import styles from '../../styles/Home.module.css';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount, useSendTransaction, useTransaction } from 'wagmi';
+import ChainSelector from './ChainSelector';
 
 interface WalletConnectProps {
   onPaymentComplete: () => void;
@@ -20,6 +21,7 @@ const WalletConnect: React.FC<WalletConnectProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   // Use the more explicit type definition
   const [txHash, setTxHash] = useState<HexString | undefined>(undefined);
+  const [selectedChainId, setSelectedChainId] = useState<number>(8453); // Default to Base
   
   // Rainbow Kit and Wagmi hooks
   const { openConnectModal } = useConnectModal();
@@ -36,6 +38,11 @@ const WalletConnect: React.FC<WalletConnectProps> = ({
   
   const isConfirming = txHash ? transactionResult.isLoading : false;
   const isConfirmed = txHash ? transactionResult.isSuccess : false;
+
+  // Handle chain change
+  const handleChainChange = (chainId: number) => {
+    setSelectedChainId(chainId);
+  };
 
   // Add this effect to capture the transaction hash when available
   useEffect(() => {
@@ -66,9 +73,23 @@ const WalletConnect: React.FC<WalletConnectProps> = ({
   const handleSendPayment = () => {
     setIsProcessing(true);
 
+    // Recipient addresses by chain
+    const recipientAddresses: Record<number, `0x${string}`> = {
+      8453: '0xbA8C2947d12C34A4319D1edCbaE8B6F0736b4467', // Base recipient
+      324: '0xbA8C2947d12C34A4319D1edCbaE8B6F0736b4467',  // zkSync recipient
+      747: '0xbA8C2947d12C34A4319D1edCbaE8B6F0736b4467'   // Flow recipient
+    };
+
+    // Payment amounts by chain - adjust based on token values
+    const paymentAmounts: Record<number, bigint> = {
+      8453: BigInt(100000000000000), // 0.001 ETH on Base
+      324: BigInt(100000000000000),  // 0.001 ETH on zkSync
+      747: BigInt(1000000000000000)  // 0.01 FLOW on Flow (adjusted for different token value)
+    };
+
     sendTransaction({
-      to: '0xbA8C2947d12C34A4319D1edCbaE8B6F0736b4467', // Replace with actual recipient address
-      value: BigInt(100000000000000), // 0.001 ETH in wei (adjust as needed)
+      to: recipientAddresses[selectedChainId],
+      value: paymentAmounts[selectedChainId],
     });
   };
 
@@ -87,6 +108,9 @@ const WalletConnect: React.FC<WalletConnectProps> = ({
 
   return (
     <div className={styles.walletConnectContainer}>
+      {/* Chain Selector appears at the top regardless of connection status */}
+      <ChainSelector onChainChange={handleChainChange} />
+      
       {!isConnected ? (
         <>
           <p>Please connect your wallet to process the payment.</p>
