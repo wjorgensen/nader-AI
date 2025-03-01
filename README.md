@@ -55,6 +55,28 @@ We hope to continue to add more workers and services to give nader-ai better con
 
 Think you can just waltz in here? Nah. This isn't some Web2 LinkedIn circle where everyone's a "blockchain expert". You need a referral from someone already in the network—and they're putting their reputation (and crypto) on the line for you. Every successful referral that makes it through our vetting pays out in ETH to whoever vouched for them. But here's the catch: if you refer someone who's all cap and no ship, you're taking a rep hit. No pressure. Quality over quantity, always. Real recognizes real, and in this game, your network is your net worth.
 
+## Blockchain Integration & Payment System
+
+Nader AI operates across multiple chains to provide flexibility and accessibility for our users:
+
+### Supported Chains
+- **Base (Chain ID: 8453)**: Our primary network with fast, low-cost transactions
+- **zkSync (Chain ID: 324)**: Leveraging zero-knowledge proofs for enhanced scalability 
+- **Flow (Chain ID: 747)**: Alternative network for broader compatibility
+
+### AgentWallet Smart Contract
+Our custom AgentWallet contract manages all financial operations in a trustless manner:
+- Securely collects and manages payments
+- Automatically distributes referral payments (0.01 ETH per successful referral)
+- Allows transparent withdrawal by the contract owner
+
+### Smart Contract Deployments
+| Chain | Contract Address |
+|-------|------------------|
+| Base | 0x65aeC0B96491566e9055c57e882d45d86De24219 |
+| zkSync | 0xbA8C2947d12C34A4319D1edCbaE8B6F0736b4467 |
+| Flow | 0x65aeC0B96491566e9055c57e882d45d86De24219 |
+
 ## Get Connected
 
 - Builders: Hit up @nader_ai_agent_bot on Telegram

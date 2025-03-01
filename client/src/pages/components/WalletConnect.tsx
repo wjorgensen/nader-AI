@@ -75,16 +75,16 @@ const WalletConnect: React.FC<WalletConnectProps> = ({
 
     // Recipient addresses by chain
     const recipientAddresses: Record<number, `0x${string}`> = {
-      8453: '0xbA8C2947d12C34A4319D1edCbaE8B6F0736b4467', // Base recipient
+      8453: '0x65aeC0B96491566e9055c57e882d45d86De24219', // Base recipient
       324: '0xbA8C2947d12C34A4319D1edCbaE8B6F0736b4467',  // zkSync recipient
-      747: '0xbA8C2947d12C34A4319D1edCbaE8B6F0736b4467'   // Flow recipient
+      747: '0x65aeC0B96491566e9055c57e882d45d86De24219'   // Flow recipient
     };
 
     // Payment amounts by chain - adjust based on token values
     const paymentAmounts: Record<number, bigint> = {
-      8453: BigInt(100000000000000), // 0.001 ETH on Base
-      324: BigInt(100000000000000),  // 0.001 ETH on zkSync
-      747: BigInt(1000000000000000)  // 0.01 FLOW on Flow (adjusted for different token value)
+      8453: BigInt(10000000000000), // 0.001 ETH on Base
+      324: BigInt(10000000000000),  // 0.001 ETH on zkSync
+      747: BigInt(10000000000000000)  // 0.01 FLOW on Flow (adjusted for different token value)
     };
 
     sendTransaction({
