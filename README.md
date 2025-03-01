@@ -2,6 +2,8 @@
 
 Nader AI is a closed network of the most savage builders in web3, and you don't get in by updating your LinkedIn. This is the talent hub you've never heard of—and won't, unless one of our nodes decides you're worth bringing into the fold. No resume spam, no recruiter cold calls, just pure, validated technical excellence connecting with opportunities that actually matter.
 
+#### [naderai.xyz](https://naderai.xyz)
+
 #### [DEMO VIDEO](https://www.loom.com/share/89a06f61d3cc4cffa0bfe517a6abfc87?sid=2e40f199-fc00-4107-bfd5-02c0cfc990af)
 
 
